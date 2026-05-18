@@ -1,9 +1,12 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = 3000;
+const JWT_SECRET = 'secret_key';
 
 // Middleware: allows Express to read JSON body from Postman
 app.use(cors());
@@ -31,6 +34,118 @@ db.connect((err) => {
 app.get('/', (req, res) => {
     res.send('API server is running');
 });
+
+// REGISTER
+app.post('/register', async (req, res) => {
+    const { name, username, password } = req.body;
+
+    if (!name || !username || !password) {
+        return res.status(400).json({
+            message: 'Name, username, and password are required'
+        });
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        db.query(
+            'INSERT INTO users (name, username, password) VALUES (?, ?, ?)',
+            [name, username, hashedPassword],
+            (err, result) => {
+                if (err) {
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        return res.status(400).json({
+                            message: 'username already exists'
+                        });
+                    }
+
+                    return res.status(500).json({
+                        message: 'Failed to register user',
+                        error: err.message
+                    });
+                }
+
+                res.status(201).json({
+                    message: 'User registered successfully',
+                    userId: result.insertId
+                });
+            }
+        );
+    } catch (error) {
+        res.status(500).json({
+            message: 'Server error',
+            error: error.message
+        });
+    }
+});
+
+// LOGIN
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({
+            message: 'username and password are required'
+        });
+    }
+
+    db.query(
+        'SELECT * FROM users WHERE username = ?',
+        [username],
+        async (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Login failed',
+                    error: err.message
+                });
+            }
+
+            if (result.length === 0) {
+                return res.status(401).json({
+                    message: 'Invalid username or password'
+                });
+            }
+
+            const user = result[0];
+
+            if (user.disabled) {
+                return res.status(403).json({
+                    message: 'Account is disabled'
+                });
+            }
+
+            const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+            if (!isPasswordCorrect) {
+                return res.status(401).json({
+                    message: 'Invalid username or password'
+                });
+            }
+
+            const token = jwt.sign(
+                {
+                    id: user.id,
+                    name: user.name,
+                    username: user.username
+                },
+                JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+
+            res.json({
+                message: 'Login successful',
+                token: token,
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    username: user.username
+                }
+            });
+        }
+    );
+});
+
+
 
 // CREATE USER
 app.post('/add-user', (req, res) => {
@@ -61,8 +176,38 @@ app.post('/add-user', (req, res) => {
     );
 });
 
-// READ ALL USERS
-app.get('/users', (req, res) => {
+// AUTH MIDDLEWARE
+function verifyToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+
+    if (!authHeader) {
+        return res.status(401).json({
+            message: 'No token provided'
+        });
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({
+            message: 'Invalid token format'
+        });
+    }
+
+    jwt.verify(token, JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).json({
+                message: 'Invalid or expired token'
+            });
+        }
+
+        req.user = decoded;
+        next();
+    });
+}
+
+// USERS ROUTE 
+app.get('/users', verifyToken, (req, res) => {
     db.query('SELECT * FROM users', (err, result) => {
         if (err) {
             return res.status(500).json({
