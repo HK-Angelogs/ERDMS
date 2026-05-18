@@ -1,0 +1,36 @@
+<h2>User Management</h2>
+
+<input [(ngModel)]="name" placeholder="Enter Name">
+
+@if (editingId === null) {
+<button (click)="addUser()">Add User</button>
+} @else {
+<button (click)="updateUser()">Update User</button>
+<button (click)="cancelEdit()">Cancel</button>
+}
+
+<p>Current input: {{ name }}</p>
+
+<ul>
+    @for (user of users; track user.id) {
+    <li [class.disabled-user]="user.disabled">
+        <span>
+            {{ user.name }}
+
+            @if (user.disabled) {
+            <strong> - Disabled</strong>
+            }
+        </span>
+
+        <button (click)="editUser(user)" [disabled]="user.disabled">
+            Edit
+        </button>
+
+        @if (!user.disabled) {
+        <button (click)="disableUser(user.id)">Disable</button>
+        } @else {
+        <button (click)="enableUser(user.id)">Enable</button>
+        }
+    </li>
+    }
+</ul>
