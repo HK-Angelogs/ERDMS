@@ -1,0 +1,16 @@
+<h2>Login</h2>
+
+<input [(ngModel)]="username" placeholder="Enter username">
+<br>
+
+<input [(ngModel)]="password" type="password" placeholder="Enter Password">
+<br>
+
+<button (click)="login()">Login</button>
+
+<p>{{ message }}</p>
+
+<p>
+    No account yet?
+    <a routerLink="/register">Register here</a>
+</p>

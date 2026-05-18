@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-users',
@@ -17,19 +18,38 @@ export class Users implements OnInit {
 
   users: any[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) { }
+
+  getAuthHeaders() {
+    const token = localStorage.getItem('token');
+
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    };
+  }
+
+
 
   ngOnInit() {
     this.loadUsers();
   }
 
   loadUsers() {
-    this.http.get<any[]>(`${this.apiUrl}/users`).subscribe({
+    this.http.get<any[]>(`${this.apiUrl}/users`, this.getAuthHeaders()).subscribe({
       next: (data) => {
         this.users = data;
       },
       error: (err) => {
         console.error('Failed to load users:', err);
+
+        if (err.status === 401 || err.status === 403) {
+          this.router.navigate(['/login']);
+        }
       }
     });
   }
@@ -110,5 +130,10 @@ export class Users implements OnInit {
   cancelEdit() {
     this.name = '';
     this.editingId = null;
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    this.router.navigate(['/login']);
   }
 }

@@ -1,5 +1,7 @@
 <h2>User Management</h2>
 
+<button (click)="logout()">Logout</button>
+
 <input [(ngModel)]="name" placeholder="Enter Name">
 
 @if (editingId === null) {
