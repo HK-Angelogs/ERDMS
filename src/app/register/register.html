@@ -1,19 +1,45 @@
-<h2>Register</h2>
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h2>Create Account</h2>
+            <p>Register a new account</p>
+        </div>
 
-<input [(ngModel)]="name" placeholder="Enter Name">
-<br>
+        <form class="login-form" (ngSubmit)="register()" #registerForm="ngForm" novalidate>
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <input type="text" id="username" name="username" [(ngModel)]="username" required
+                        autocomplete="username">
+                    <label for="username">Username</label>
+                    <span class="focus-border"></span>
+                </div>
+            </div>
 
-<input [(ngModel)]="username" placeholder="Enter username">
-<br>
+            <div class="form-group">
+                <div class="input-wrapper password-wrapper">
+                    <input type="password" id="password" name="password" [(ngModel)]="password" required
+                        autocomplete="new-password">
+                    <label for="password">Password</label>
+                    <span class="focus-border"></span>
+                </div>
+            </div>
 
-<input [(ngModel)]="password" type="password" placeholder="Enter Password">
-<br>
+            <button type="submit" class="login-btn btn">
+                <span class="btn-text">Register</span>
+            </button>
+        </form>
 
-<button (click)="register()">Register</button>
+        @if (message) {
+        <p class="error-message">
+            {{ message }}
+        </p>
+        }
 
-<p>{{ message }}</p>
-
-<p>
-    Already have an account?
-    <a routerLink="/login">Login here</a>
-</p>
+        <div class="signup-link">
+            <p>
+                Already have an account?
+                <a routerLink="/login">Login here</a>
+            </p>
+        </div>
+    </div>
+</div>

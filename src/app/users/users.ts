@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
   styleUrl: './users.css'
 })
 export class Users implements OnInit {
-  name = '';
+  username = '';
   editingId: number | null = null;
 
   apiUrl = 'http://localhost:3000';
@@ -55,15 +55,15 @@ export class Users implements OnInit {
   }
 
   addUser() {
-    if (this.name.trim() === '') {
+    if (this.username.trim() === '') {
       return;
     }
 
     this.http.post(`${this.apiUrl}/add-user`, {
-      name: this.name
+      username: this.username
     }).subscribe({
       next: () => {
-        this.name = '';
+        this.username = '';
         this.loadUsers();
       },
       error: (err) => {
@@ -78,19 +78,19 @@ export class Users implements OnInit {
     }
 
     this.editingId = user.id;
-    this.name = user.name;
+    this.username = user.username;
   }
 
   updateUser() {
-    if (this.name.trim() === '' || this.editingId === null) {
+    if (this.username.trim() === '' || this.editingId === null) {
       return;
     }
 
     this.http.put(`${this.apiUrl}/update-user/${this.editingId}`, {
-      name: this.name
+      username: this.username
     }).subscribe({
       next: () => {
-        this.name = '';
+        this.username = '';
         this.editingId = null;
         this.loadUsers();
       },
@@ -111,7 +111,7 @@ export class Users implements OnInit {
     });
 
     if (this.editingId === id) {
-      this.name = '';
+      this.username = '';
       this.editingId = null;
     }
   }
@@ -128,7 +128,7 @@ export class Users implements OnInit {
   }
 
   cancelEdit() {
-    this.name = '';
+    this.username = '';
     this.editingId = null;
   }
 

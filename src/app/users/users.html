@@ -2,7 +2,7 @@
 
 <button (click)="logout()">Logout</button>
 
-<input [(ngModel)]="name" placeholder="Enter Name">
+<input [(ngModel)]="username" placeholder="Enter Username">
 
 @if (editingId === null) {
 <button (click)="addUser()">Add User</button>
@@ -11,13 +11,13 @@
 <button (click)="cancelEdit()">Cancel</button>
 }
 
-<p>Current input: {{ name }}</p>
+<p>Current input: {{ username }}</p>
 
 <ul>
     @for (user of users; track user.id) {
     <li [class.disabled-user]="user.disabled">
         <span>
-            {{ user.name }} - {{ user.username }} - Role: {{ user.role }}
+            {{ user.username }} - Role: {{ user.role }}
 
             @if (user.disabled) {
             <strong> - Disabled</strong>

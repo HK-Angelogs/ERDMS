@@ -11,7 +11,6 @@ import { Router, RouterLink } from '@angular/router';
   styleUrl: './register.css'
 })
 export class Register {
-  name = '';
   username = '';
   password = '';
   message = '';
@@ -22,13 +21,12 @@ export class Register {
   ) { }
 
   register() {
-    if (!this.name || !this.username || !this.password) {
+    if (!this.username || !this.password) {
       this.message = 'Please fill out all fields';
       return;
     }
 
     this.authService.register({
-      name: this.name,
       username: this.username,
       password: this.password
     }).subscribe({

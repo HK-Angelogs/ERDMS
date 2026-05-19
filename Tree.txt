@@ -47,6 +47,52 @@
 │   │   │   ├── LICENSE.md
 │   │   │   ├── package.json
 │   │   │   └── README.md
+│   │   ├── bcrypt
+│   │   │   ├── bcrypt.js
+│   │   │   ├── binding.gyp
+│   │   │   ├── build-all.sh
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── Dockerfile
+│   │   │   ├── Dockerfile-alpine
+│   │   │   ├── examples
+│   │   │   │   ├── async_compare.js
+│   │   │   │   └── forever_gen_salt.js
+│   │   │   ├── ISSUE_TEMPLATE.md
+│   │   │   ├── LICENSE
+│   │   │   ├── Makefile
+│   │   │   ├── package.json
+│   │   │   ├── prebuilds
+│   │   │   │   ├── darwin-arm64
+│   │   │   │   │   └── bcrypt.node
+│   │   │   │   ├── darwin-x64
+│   │   │   │   │   └── bcrypt.node
+│   │   │   │   ├── linux-arm
+│   │   │   │   │   ├── bcrypt.glibc.node
+│   │   │   │   │   └── bcrypt.musl.node
+│   │   │   │   ├── linux-arm64
+│   │   │   │   │   ├── bcrypt.glibc.node
+│   │   │   │   │   └── bcrypt.musl.node
+│   │   │   │   ├── linux-x64
+│   │   │   │   │   ├── bcrypt.glibc.node
+│   │   │   │   │   └── bcrypt.musl.node
+│   │   │   │   ├── win32-arm64
+│   │   │   │   │   └── bcrypt.node
+│   │   │   │   └── win32-x64
+│   │   │   │       └── bcrypt.node
+│   │   │   ├── promises.js
+│   │   │   ├── README.md
+│   │   │   ├── SECURITY.md
+│   │   │   ├── src
+│   │   │   │   ├── bcrypt.cc
+│   │   │   │   ├── bcrypt_node.cc
+│   │   │   │   ├── blowfish.cc
+│   │   │   │   └── node_blf.h
+│   │   │   └── test
+│   │   │       ├── async.test.js
+│   │   │       ├── implementation.test.js
+│   │   │       ├── promise.test.js
+│   │   │       ├── repetitions.test.js
+│   │   │       └── sync.test.js
 │   │   ├── binary-extensions
 │   │   │   ├── binary-extensions.json
 │   │   │   ├── binary-extensions.json.d.ts
@@ -97,6 +143,12 @@
 │   │   │   ├── LICENSE
 │   │   │   ├── package.json
 │   │   │   └── README.md
+│   │   ├── buffer-equal-constant-time
+│   │   │   ├── index.js
+│   │   │   ├── LICENSE.txt
+│   │   │   ├── package.json
+│   │   │   ├── README.md
+│   │   │   └── test.js
 │   │   ├── bytes
 │   │   │   ├── History.md
 │   │   │   ├── index.js
@@ -198,6 +250,25 @@
 │   │   │   ├── LICENSE
 │   │   │   ├── package.json
 │   │   │   └── Readme.md
+│   │   ├── dotenv
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── config.d.ts
+│   │   │   ├── config.js
+│   │   │   ├── lib
+│   │   │   │   ├── cli-options.js
+│   │   │   │   ├── env-options.js
+│   │   │   │   ├── main.d.ts
+│   │   │   │   └── main.js
+│   │   │   ├── LICENSE
+│   │   │   ├── package.json
+│   │   │   ├── README-es.md
+│   │   │   ├── README.md
+│   │   │   ├── SECURITY.md
+│   │   │   └── skills
+│   │   │       ├── dotenv
+│   │   │       │   └── SKILL.md
+│   │   │       └── dotenvx
+│   │   │           └── SKILL.md
 │   │   ├── dunder-proto
 │   │   │   ├── CHANGELOG.md
 │   │   │   ├── get.d.ts
@@ -212,6 +283,15 @@
 │   │   │   │   ├── index.js
 │   │   │   │   └── set.js
 │   │   │   └── tsconfig.json
+│   │   ├── ecdsa-sig-formatter
+│   │   │   ├── CODEOWNERS
+│   │   │   ├── LICENSE
+│   │   │   ├── package.json
+│   │   │   ├── README.md
+│   │   │   └── src
+│   │   │       ├── ecdsa-sig-formatter.d.ts
+│   │   │       ├── ecdsa-sig-formatter.js
+│   │   │       └── param-bytes-for-alg.js
 │   │   ├── ee-first
 │   │   │   ├── index.js
 │   │   │   ├── LICENSE
@@ -490,6 +570,76 @@
 │   │   │   └── readme.md
 │   │   ├── is-property
 │   │   │   ├── is-property.js
+│   │   │   ├── LICENSE
+│   │   │   ├── package.json
+│   │   │   └── README.md
+│   │   ├── jsonwebtoken
+│   │   │   ├── decode.js
+│   │   │   ├── index.js
+│   │   │   ├── lib
+│   │   │   │   ├── asymmetricKeyDetailsSupported.js
+│   │   │   │   ├── JsonWebTokenError.js
+│   │   │   │   ├── NotBeforeError.js
+│   │   │   │   ├── psSupported.js
+│   │   │   │   ├── rsaPssKeyDetailsSupported.js
+│   │   │   │   ├── timespan.js
+│   │   │   │   ├── TokenExpiredError.js
+│   │   │   │   └── validateAsymmetricKey.js
+│   │   │   ├── LICENSE
+│   │   │   ├── package.json
+│   │   │   ├── README.md
+│   │   │   ├── sign.js
+│   │   │   └── verify.js
+│   │   ├── jwa
+│   │   │   ├── index.js
+│   │   │   ├── LICENSE
+│   │   │   ├── opslevel.yml
+│   │   │   ├── package.json
+│   │   │   └── README.md
+│   │   ├── jws
+│   │   │   ├── CHANGELOG.md
+│   │   │   ├── index.js
+│   │   │   ├── lib
+│   │   │   │   ├── data-stream.js
+│   │   │   │   ├── sign-stream.js
+│   │   │   │   ├── tostring.js
+│   │   │   │   └── verify-stream.js
+│   │   │   ├── LICENSE
+│   │   │   ├── opslevel.yml
+│   │   │   ├── package.json
+│   │   │   └── readme.md
+│   │   ├── lodash.includes
+│   │   │   ├── index.js
+│   │   │   ├── LICENSE
+│   │   │   ├── package.json
+│   │   │   └── README.md
+│   │   ├── lodash.isboolean
+│   │   │   ├── index.js
+│   │   │   ├── LICENSE
+│   │   │   ├── package.json
+│   │   │   └── README.md
+│   │   ├── lodash.isinteger
+│   │   │   ├── index.js
+│   │   │   ├── LICENSE
+│   │   │   ├── package.json
+│   │   │   └── README.md
+│   │   ├── lodash.isnumber
+│   │   │   ├── index.js
+│   │   │   ├── LICENSE
+│   │   │   ├── package.json
+│   │   │   └── README.md
+│   │   ├── lodash.isplainobject
+│   │   │   ├── index.js
+│   │   │   ├── LICENSE
+│   │   │   ├── package.json
+│   │   │   └── README.md
+│   │   ├── lodash.isstring
+│   │   │   ├── index.js
+│   │   │   ├── LICENSE
+│   │   │   ├── package.json
+│   │   │   └── README.md
+│   │   ├── lodash.once
+│   │   │   ├── index.js
 │   │   │   ├── LICENSE
 │   │   │   ├── package.json
 │   │   │   └── README.md
@@ -806,6 +956,36 @@
 │   │   │   ├── LICENSE
 │   │   │   ├── package.json
 │   │   │   └── README.md
+│   │   ├── node-addon-api
+│   │   │   ├── common.gypi
+│   │   │   ├── except.gypi
+│   │   │   ├── index.js
+│   │   │   ├── LICENSE.md
+│   │   │   ├── napi.h
+│   │   │   ├── napi-inl.deprecated.h
+│   │   │   ├── napi-inl.h
+│   │   │   ├── node_addon_api.gyp
+│   │   │   ├── node_api.gyp
+│   │   │   ├── noexcept.gypi
+│   │   │   ├── nothing.c
+│   │   │   ├── package.json
+│   │   │   ├── package-support.json
+│   │   │   ├── README.md
+│   │   │   └── tools
+│   │   │       ├── check-napi.js
+│   │   │       ├── clang-format.js
+│   │   │       ├── conversion.js
+│   │   │       └── README.md
+│   │   ├── node-gyp-build
+│   │   │   ├── bin.js
+│   │   │   ├── build-test.js
+│   │   │   ├── index.js
+│   │   │   ├── LICENSE
+│   │   │   ├── node-gyp-build.js
+│   │   │   ├── optional.js
+│   │   │   ├── package.json
+│   │   │   ├── README.md
+│   │   │   └── SECURITY.md
 │   │   ├── nodemon
 │   │   │   ├── bin
 │   │   │   │   ├── nodemon.js
@@ -1002,6 +1182,12 @@
 │   │   │   ├── lib
 │   │   │   │   ├── layer.js
 │   │   │   │   └── route.js
+│   │   │   ├── LICENSE
+│   │   │   ├── package.json
+│   │   │   └── README.md
+│   │   ├── safe-buffer
+│   │   │   ├── index.d.ts
+│   │   │   ├── index.js
 │   │   │   ├── LICENSE
 │   │   │   ├── package.json
 │   │   │   └── README.md
@@ -11049,6 +11235,73 @@
 │   │   ├── LICENSE.txt
 │   │   ├── package.json
 │   │   └── README.md
+│   ├── bcrypt
+│   │   ├── bcrypt.js
+│   │   ├── binding.gyp
+│   │   ├── build-all.sh
+│   │   ├── CHANGELOG.md
+│   │   ├── Dockerfile
+│   │   ├── Dockerfile-alpine
+│   │   ├── examples
+│   │   │   ├── async_compare.js
+│   │   │   └── forever_gen_salt.js
+│   │   ├── ISSUE_TEMPLATE.md
+│   │   ├── LICENSE
+│   │   ├── Makefile
+│   │   ├── node_modules
+│   │   │   └── node-addon-api
+│   │   │       ├── common.gypi
+│   │   │       ├── except.gypi
+│   │   │       ├── index.js
+│   │   │       ├── LICENSE.md
+│   │   │       ├── napi.h
+│   │   │       ├── napi-inl.deprecated.h
+│   │   │       ├── napi-inl.h
+│   │   │       ├── node_addon_api.gyp
+│   │   │       ├── node_api.gyp
+│   │   │       ├── noexcept.gypi
+│   │   │       ├── nothing.c
+│   │   │       ├── package.json
+│   │   │       ├── package-support.json
+│   │   │       ├── README.md
+│   │   │       └── tools
+│   │   │           ├── check-napi.js
+│   │   │           ├── clang-format.js
+│   │   │           ├── conversion.js
+│   │   │           └── README.md
+│   │   ├── package.json
+│   │   ├── prebuilds
+│   │   │   ├── darwin-arm64
+│   │   │   │   └── bcrypt.node
+│   │   │   ├── darwin-x64
+│   │   │   │   └── bcrypt.node
+│   │   │   ├── linux-arm
+│   │   │   │   ├── bcrypt.glibc.node
+│   │   │   │   └── bcrypt.musl.node
+│   │   │   ├── linux-arm64
+│   │   │   │   ├── bcrypt.glibc.node
+│   │   │   │   └── bcrypt.musl.node
+│   │   │   ├── linux-x64
+│   │   │   │   ├── bcrypt.glibc.node
+│   │   │   │   └── bcrypt.musl.node
+│   │   │   ├── win32-arm64
+│   │   │   │   └── bcrypt.node
+│   │   │   └── win32-x64
+│   │   │       └── bcrypt.node
+│   │   ├── promises.js
+│   │   ├── README.md
+│   │   ├── SECURITY.md
+│   │   ├── src
+│   │   │   ├── bcrypt.cc
+│   │   │   ├── bcrypt_node.cc
+│   │   │   ├── blowfish.cc
+│   │   │   └── node_blf.h
+│   │   └── test
+│   │       ├── async.test.js
+│   │       ├── implementation.test.js
+│   │       ├── promise.test.js
+│   │       ├── repetitions.test.js
+│   │       └── sync.test.js
 │   ├── beasties
 │   │   ├── dist
 │   │   │   ├── index.cjs
@@ -11150,6 +11403,12 @@
 │   │   ├── package.json
 │   │   ├── parse.js
 │   │   └── README.md
+│   ├── buffer-equal-constant-time
+│   │   ├── index.js
+│   │   ├── LICENSE.txt
+│   │   ├── package.json
+│   │   ├── README.md
+│   │   └── test.js
 │   ├── buffer-from
 │   │   ├── index.js
 │   │   ├── LICENSE
@@ -13257,6 +13516,25 @@
 │   │   ├── LICENSE
 │   │   ├── package.json
 │   │   └── readme.md
+│   ├── dotenv
+│   │   ├── CHANGELOG.md
+│   │   ├── config.d.ts
+│   │   ├── config.js
+│   │   ├── lib
+│   │   │   ├── cli-options.js
+│   │   │   ├── env-options.js
+│   │   │   ├── main.d.ts
+│   │   │   └── main.js
+│   │   ├── LICENSE
+│   │   ├── package.json
+│   │   ├── README-es.md
+│   │   ├── README.md
+│   │   ├── SECURITY.md
+│   │   └── skills
+│   │       ├── dotenv
+│   │       │   └── SKILL.md
+│   │       └── dotenvx
+│   │           └── SKILL.md
 │   ├── dunder-proto
 │   │   ├── CHANGELOG.md
 │   │   ├── get.d.ts
@@ -13271,6 +13549,15 @@
 │   │   │   ├── index.js
 │   │   │   └── set.js
 │   │   └── tsconfig.json
+│   ├── ecdsa-sig-formatter
+│   │   ├── CODEOWNERS
+│   │   ├── LICENSE
+│   │   ├── package.json
+│   │   ├── README.md
+│   │   └── src
+│   │       ├── ecdsa-sig-formatter.d.ts
+│   │       ├── ecdsa-sig-formatter.js
+│   │       └── param-bytes-for-alg.js
 │   ├── ee-first
 │   │   ├── index.js
 │   │   ├── LICENSE
@@ -16639,12 +16926,47 @@
 │   │   ├── LICENSE.md
 │   │   ├── package.json
 │   │   └── README.md
+│   ├── jsonwebtoken
+│   │   ├── decode.js
+│   │   ├── index.js
+│   │   ├── lib
+│   │   │   ├── asymmetricKeyDetailsSupported.js
+│   │   │   ├── JsonWebTokenError.js
+│   │   │   ├── NotBeforeError.js
+│   │   │   ├── psSupported.js
+│   │   │   ├── rsaPssKeyDetailsSupported.js
+│   │   │   ├── timespan.js
+│   │   │   ├── TokenExpiredError.js
+│   │   │   └── validateAsymmetricKey.js
+│   │   ├── LICENSE
+│   │   ├── package.json
+│   │   ├── README.md
+│   │   ├── sign.js
+│   │   └── verify.js
 │   ├── js-tokens
 │   │   ├── CHANGELOG.md
 │   │   ├── index.js
 │   │   ├── LICENSE
 │   │   ├── package.json
 │   │   └── README.md
+│   ├── jwa
+│   │   ├── index.js
+│   │   ├── LICENSE
+│   │   ├── opslevel.yml
+│   │   ├── package.json
+│   │   └── README.md
+│   ├── jws
+│   │   ├── CHANGELOG.md
+│   │   ├── index.js
+│   │   ├── lib
+│   │   │   ├── data-stream.js
+│   │   │   ├── sign-stream.js
+│   │   │   ├── tostring.js
+│   │   │   └── verify-stream.js
+│   │   ├── LICENSE
+│   │   ├── opslevel.yml
+│   │   ├── package.json
+│   │   └── readme.md
 │   ├── @listr2
 │   │   └── prompt-adapter-inquirer
 │   │       ├── dist
@@ -16828,6 +17150,41 @@
 │   │   │   ├── set-optional-deps.cjs
 │   │   │   └── when.js
 │   │   └── write.js
+│   ├── lodash.includes
+│   │   ├── index.js
+│   │   ├── LICENSE
+│   │   ├── package.json
+│   │   └── README.md
+│   ├── lodash.isboolean
+│   │   ├── index.js
+│   │   ├── LICENSE
+│   │   ├── package.json
+│   │   └── README.md
+│   ├── lodash.isinteger
+│   │   ├── index.js
+│   │   ├── LICENSE
+│   │   ├── package.json
+│   │   └── README.md
+│   ├── lodash.isnumber
+│   │   ├── index.js
+│   │   ├── LICENSE
+│   │   ├── package.json
+│   │   └── README.md
+│   ├── lodash.isplainobject
+│   │   ├── index.js
+│   │   ├── LICENSE
+│   │   ├── package.json
+│   │   └── README.md
+│   ├── lodash.isstring
+│   │   ├── index.js
+│   │   ├── LICENSE
+│   │   ├── package.json
+│   │   └── README.md
+│   ├── lodash.once
+│   │   ├── index.js
+│   │   ├── LICENSE
+│   │   ├── package.json
+│   │   └── README.md
 │   ├── log-symbols
 │   │   ├── browser.js
 │   │   ├── browser-symbols.js
@@ -18393,6 +18750,16 @@
 │   │   ├── SECURITY.md
 │   │   └── src
 │   │       └── win_delay_load_hook.cc
+│   ├── node-gyp-build
+│   │   ├── bin.js
+│   │   ├── build-test.js
+│   │   ├── index.js
+│   │   ├── LICENSE
+│   │   ├── node-gyp-build.js
+│   │   ├── optional.js
+│   │   ├── package.json
+│   │   ├── README.md
+│   │   └── SECURITY.md
 │   ├── node-gyp-build-optional-packages
 │   │   ├── bin.js
 │   │   ├── build-test.js
@@ -22432,6 +22799,12 @@
 │   │   ├── tsconfig.json
 │   │   └── webSocket
 │   │       └── package.json
+│   ├── safe-buffer
+│   │   ├── index.d.ts
+│   │   ├── index.js
+│   │   ├── LICENSE
+│   │   ├── package.json
+│   │   └── README.md
 │   ├── safer-buffer
 │   │   ├── dangerous.js
 │   │   ├── LICENSE
@@ -26178,6 +26551,17 @@
 │   │   ├── app.routes.ts
 │   │   ├── app.spec.ts
 │   │   ├── app.ts
+│   │   ├── auth.service.ts
+│   │   ├── login
+│   │   │   ├── login.css
+│   │   │   ├── login.html
+│   │   │   ├── login.spec.ts
+│   │   │   └── login.ts
+│   │   ├── register
+│   │   │   ├── register.css
+│   │   │   ├── register.html
+│   │   │   ├── register.spec.ts
+│   │   │   └── register.ts
 │   │   └── users
 │   │       ├── users.css
 │   │       ├── users.html
@@ -26191,4 +26575,4 @@
 ├── tsconfig.json
 └── tsconfig.spec.json
 
-2527 directories, 23665 files
+2602 directories, 23974 files

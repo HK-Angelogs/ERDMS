@@ -37,11 +37,11 @@ app.get('/', (req, res) => {
 
 // REGISTER
 app.post('/register', async (req, res) => {
-    const { name, username, password } = req.body;
+    const { username, password } = req.body;
 
-    if (!name || !username || !password) {
+    if (!username || !password) {
         return res.status(400).json({
-            message: 'Name, username, and password are required'
+            message: 'username, and password are required'
         });
     }
 
@@ -49,8 +49,8 @@ app.post('/register', async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         db.query(
-            'INSERT INTO users (name, username, password) VALUES (?, ?, ?)',
-            [name, username, hashedPassword],
+            'INSERT INTO users (username, password) VALUES ( ?, ?)',
+            [username, hashedPassword],
             (err, result) => {
                 if (err) {
                     if (err.code === 'ER_DUP_ENTRY') {
@@ -136,7 +136,6 @@ app.post('/login', (req, res) => {
                 token: token,
                 user: {
                     id: user.id,
-                    name: user.name,
                     username: user.username,
                     role: user.role
                 }
@@ -148,32 +147,56 @@ app.post('/login', (req, res) => {
 
 
 // CREATE USER
-app.post('/add-user', verifyToken, (req, res) => {
-    const { name } = req.body;
+// CREATE USER - SUPER ADMIN ONLY
+app.post('/add-user', verifyToken, verifySuperAdmin, async (req, res) => {
+    const { username, password, role } = req.body;
 
-    if (!name) {
+    const allowedRoles = ['user', 'admin'];
+
+    if (!username || !password || !role) {
         return res.status(400).json({
-            message: 'Name is required'
+            message: 'Username, password, and role are required'
         });
     }
 
-    db.query(
-        'INSERT INTO users (name) VALUES (?)',
-        [name],
-        (err, result) => {
-            if (err) {
-                return res.status(500).json({
-                    message: 'Failed to add user',
-                    error: err.message
+    if (!allowedRoles.includes(role)) {
+        return res.status(400).json({
+            message: 'Invalid role. Only user and admin can be created here.'
+        });
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        db.query(
+            'INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
+            [username, hashedPassword, role],
+            (err, result) => {
+                if (err) {
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        return res.status(400).json({
+                            message: 'Username already exists'
+                        });
+                    }
+
+                    return res.status(500).json({
+                        message: 'Failed to add user',
+                        error: err.message
+                    });
+                }
+
+                res.status(201).json({
+                    message: 'User added successfully',
+                    userId: result.insertId
                 });
             }
-
-            res.status(201).json({
-                message: 'User added successfully',
-                userId: result.insertId
-            });
-        }
-    );
+        );
+    } catch (error) {
+        res.status(500).json({
+            message: 'Server error',
+            error: error.message
+        });
+    }
 });
 
 // AUTH MIDDLEWARE
@@ -263,7 +286,7 @@ app.put('/users/:id/role', verifyToken, verifySuperAdmin, (req, res) => {
 // USERS ROUTE 
 app.get('/users', verifyToken, (req, res) => {
     db.query(
-        'SELECT id, name, username, role, disabled, created_at FROM users',
+        'SELECT id, username, role, disabled, created_at FROM users',
         (err, result) => {
             if (err) {
                 return res.status(500).json({
@@ -303,19 +326,19 @@ app.get('/users/:id', (req, res) => {
 });
 
 // UPDATE USER
-app.put('/update-user/:id', verifyToken, (req, res) => {
+app.put('/update-user/:id', verifyToken, verifySuperAdmin, async (req, res) => {
     const { id } = req.params;
-    const { name } = req.body;
+    const { username } = req.body;
 
-    if (!name) {
+    if (!username) {
         return res.status(400).json({
-            message: 'Name is required'
+            message: 'Username is required'
         });
     }
 
     db.query(
-        'UPDATE users SET name = ? WHERE id = ?',
-        [name, id],
+        'UPDATE users SET username = ? WHERE id = ?',
+        [username, id],
         (err, result) => {
             if (err) {
                 return res.status(500).json({
@@ -337,33 +360,6 @@ app.put('/update-user/:id', verifyToken, (req, res) => {
     );
 });
 
-// DELETE USER
-app.delete('/delete-user/:id', verifyToken, (req, res) => {
-    const { id } = req.params;
-
-    db.query(
-        'DELETE FROM users WHERE id = ?',
-        [id],
-        (err, result) => {
-            if (err) {
-                return res.status(500).json({
-                    message: 'Failed to delete user',
-                    error: err.message
-                });
-            }
-
-            if (result.affectedRows === 0) {
-                return res.status(404).json({
-                    message: 'User not found'
-                });
-            }
-
-            res.json({
-                message: 'User deleted successfully'
-            });
-        }
-    );
-});
 
 // DISABLE USER
 app.put('/disable-user/:id', verifyToken, (req, res) => {
