@@ -121,12 +121,11 @@ app.post('/login', (req, res) => {
                     message: 'Invalid username or password'
                 });
             }
-
             const token = jwt.sign(
                 {
                     id: user.id,
-                    name: user.name,
-                    username: user.username
+                    username: user.username,
+                    role: user.role
                 },
                 JWT_SECRET,
                 { expiresIn: '1h' }
@@ -138,7 +137,8 @@ app.post('/login', (req, res) => {
                 user: {
                     id: user.id,
                     name: user.name,
-                    username: user.username
+                    username: user.username,
+                    role: user.role
                 }
             });
         }
@@ -148,7 +148,7 @@ app.post('/login', (req, res) => {
 
 
 // CREATE USER
-app.post('/add-user', (req, res) => {
+app.post('/add-user', verifyToken, (req, res) => {
     const { name } = req.body;
 
     if (!name) {
@@ -206,18 +206,74 @@ function verifyToken(req, res, next) {
     });
 }
 
-// USERS ROUTE 
-app.get('/users', verifyToken, (req, res) => {
-    db.query('SELECT * FROM users', (err, result) => {
-        if (err) {
-            return res.status(500).json({
-                message: 'Failed to fetch users',
-                error: err.message
+// ROLE-BASED ACCESS CONTROL MIDDLEWARE
+function verifySuperAdmin(req, res, next) {
+    if (req.user.role !== 'super_admin') {
+        return res.status(403).json({
+            message: 'Only super admin can modify roles'
+        });
+    }
+
+    next();
+}
+
+// UPDATE USER ROLE - SUPER ADMIN ONLY
+app.put('/users/:id/role', verifyToken, verifySuperAdmin, (req, res) => {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    const allowedRoles = ['user', 'admin'];
+
+    if (!role) {
+        return res.status(400).json({
+            message: 'Role is required'
+        });
+    }
+
+    if (!allowedRoles.includes(role)) {
+        return res.status(400).json({
+            message: 'Invalid role. Only user and admin can be assigned here.'
+        });
+    }
+
+    db.query(
+        'UPDATE users SET role = ? WHERE id = ? AND role != "super_admin"',
+        [role, id],
+        (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Failed to update role',
+                    error: err.message
+                });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({
+                    message: 'User not found or cannot modify super admin'
+                });
+            }
+
+            res.json({
+                message: 'User role updated successfully'
             });
         }
+    );
+});
 
-        res.json(result);
-    });
+// USERS ROUTE 
+app.get('/users', verifyToken, (req, res) => {
+    db.query(
+        'SELECT id, name, username, role, disabled, created_at FROM users',
+        (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Failed to fetch users',
+                    error: err.message
+                });
+            }
+
+            res.json(result);
+        });
 });
 
 // READ SINGLE USER BY ID
@@ -247,7 +303,7 @@ app.get('/users/:id', (req, res) => {
 });
 
 // UPDATE USER
-app.put('/update-user/:id', (req, res) => {
+app.put('/update-user/:id', verifyToken, (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
 
@@ -282,7 +338,7 @@ app.put('/update-user/:id', (req, res) => {
 });
 
 // DELETE USER
-app.delete('/delete-user/:id', (req, res) => {
+app.delete('/delete-user/:id', verifyToken, (req, res) => {
     const { id } = req.params;
 
     db.query(
@@ -310,7 +366,7 @@ app.delete('/delete-user/:id', (req, res) => {
 });
 
 // DISABLE USER
-app.put('/disable-user/:id', (req, res) => {
+app.put('/disable-user/:id', verifyToken, (req, res) => {
     const { id } = req.params;
 
     db.query(
@@ -338,7 +394,7 @@ app.put('/disable-user/:id', (req, res) => {
 });
 
 // ENABLE USER
-app.put('/enable-user/:id', (req, res) => {
+app.put('/enable-user/:id', verifyToken, (req, res) => {
     const { id } = req.params;
 
     db.query(

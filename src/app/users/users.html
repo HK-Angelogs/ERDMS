@@ -17,7 +17,7 @@
     @for (user of users; track user.id) {
     <li [class.disabled-user]="user.disabled">
         <span>
-            {{ user.name }}
+            {{ user.name }} - {{ user.username }} - Role: {{ user.role }}
 
             @if (user.disabled) {
             <strong> - Disabled</strong>
@@ -33,6 +33,12 @@
         } @else {
         <button (click)="enableUser(user.id)">Enable</button>
         }
+
+        @if (user.role !== 'super_admin') {
+        <button (click)="changeRole(user.id, 'user')">Make User</button>
+        <button (click)="changeRole(user.id, 'admin')">Make Admin</button>
+        }
+
     </li>
     }
 </ul>

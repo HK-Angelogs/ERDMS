@@ -136,4 +136,20 @@ export class Users implements OnInit {
     localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
+
+  changeRole(id: number, role: string) {
+    this.http.put(
+      `${this.apiUrl}/users/${id}/role`,
+      { role },
+      this.getAuthHeaders()
+    ).subscribe({
+      next: () => {
+        this.loadUsers();
+      },
+      error: (err) => {
+        console.error('Failed to change role:', err);
+        alert(err.error?.message || 'Failed to change role');
+      }
+    });
+  }
 }
