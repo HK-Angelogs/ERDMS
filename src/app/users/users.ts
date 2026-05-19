@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-users',
@@ -20,7 +21,8 @@ export class Users implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private authService: AuthService,
   ) { }
 
   getAuthHeaders() {
@@ -33,11 +35,41 @@ export class Users implements OnInit {
     };
   }
 
-
+  currentRole: string | null = null;
+  currentUser: any = null;
+  currentUserId: number | null = null;
 
   ngOnInit() {
+    this.currentUser = this.authService.getUser();
+    this.currentRole = this.currentUser?.role || null;
+    this.currentUserId = this.currentUser?.id || null;
     this.loadUsers();
   }
+
+  canManageUsers(): boolean {
+    return this.currentRole === 'admin' || this.currentRole === 'super_admin';
+  }
+
+  isSuperAdmin(): boolean {
+    return this.currentRole === 'super_admin';
+  }
+
+  isOwnAccount(user: any): boolean {
+    return this.currentUserId === user.id;
+  }
+
+  canModifyUser(user: any): boolean {
+    if (this.currentRole === 'super_admin') {
+      return true;
+    }
+
+    if (this.currentRole === 'admin') {
+      return user.role === 'user';
+    }
+
+    return this.isOwnAccount(user);
+  }
+
 
   loadUsers() {
     this.http.get<any[]>(`${this.apiUrl}/users`, this.getAuthHeaders()).subscribe({
@@ -88,7 +120,7 @@ export class Users implements OnInit {
 
     this.http.put(`${this.apiUrl}/update-user/${this.editingId}`, {
       username: this.username
-    }).subscribe({
+    }, this.getAuthHeaders()).subscribe({
       next: () => {
         this.username = '';
         this.editingId = null;
@@ -101,7 +133,7 @@ export class Users implements OnInit {
   }
 
   disableUser(id: number) {
-    this.http.put(`${this.apiUrl}/disable-user/${id}`, {}).subscribe({
+    this.http.put(`${this.apiUrl}/disable-user/${id}`, {}, this.getAuthHeaders()).subscribe({
       next: () => {
         this.loadUsers();
       },
@@ -117,7 +149,7 @@ export class Users implements OnInit {
   }
 
   enableUser(id: number) {
-    this.http.put(`${this.apiUrl}/enable-user/${id}`, {}).subscribe({
+    this.http.put(`${this.apiUrl}/enable-user/${id}`, {}, this.getAuthHeaders()).subscribe({
       next: () => {
         this.loadUsers();
       },
@@ -152,4 +184,5 @@ export class Users implements OnInit {
       }
     });
   }
+
 }

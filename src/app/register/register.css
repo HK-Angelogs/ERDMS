@@ -119,7 +119,7 @@
 
 .input-wrapper input:focus+label,
 .input-wrapper input:valid+label {
-    transform: translateY(-9px) scale(0.85);
+    transform: translateY(-13px) scale(0.85);
     color: #ffffff;
     font-weight: 500;
 }

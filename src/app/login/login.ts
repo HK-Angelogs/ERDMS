@@ -80,6 +80,7 @@ export class Login implements AfterViewInit, OnDestroy {
     }).subscribe({
       next: (response) => {
         this.authService.saveToken(response.token);
+        this.authService.saveUser(response.user);
         this.router.navigate(['/users']);
       },
       error: (err) => {

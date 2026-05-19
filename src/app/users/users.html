@@ -24,21 +24,31 @@
             }
         </span>
 
+        @if (canModifyUser(user)) {
         <button (click)="editUser(user)" [disabled]="user.disabled">
             Edit
         </button>
 
         @if (!user.disabled) {
-        <button (click)="disableUser(user.id)">Disable</button>
+        <button (click)="disableUser(user.id)">
+            Disable
+        </button>
         } @else {
-        <button (click)="enableUser(user.id)">Enable</button>
+        <button (click)="enableUser(user.id)">
+            Enable
+        </button>
+        }
         }
 
-        @if (user.role !== 'super_admin') {
-        <button (click)="changeRole(user.id, 'user')">Make User</button>
-        <button (click)="changeRole(user.id, 'admin')">Make Admin</button>
-        }
+        @if (isSuperAdmin() && user.role !== 'super_admin') {
+        <button (click)="changeRole(user.id, 'user')">
+            Make User
+        </button>
 
+        <button (click)="changeRole(user.id, 'admin')">
+            Make Admin
+        </button>
+        }
     </li>
     }
 </ul>

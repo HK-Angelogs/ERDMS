@@ -33,4 +33,16 @@ export class AuthService {
     logout(): void {
         localStorage.removeItem('token');
     }
+    saveUser(user: any): void {
+        localStorage.setItem('user', JSON.stringify(user));
+    }
+
+    getUser(): any {
+        const user = localStorage.getItem('user');
+        return user ? JSON.parse(user) : null;
+    }
+
+    getRole(): string | null {
+        return this.getUser()?.role || null;
+    }
 }
