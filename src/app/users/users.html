@@ -1,54 +1,117 @@
-<h2>User Management</h2>
+<div class="users-page">
+    <header class="users-header">
+        <div>
+            <h1>User Management System</h1>
+            <p>Manage users, account status, and role permissions.</p>
+        </div>
 
-<button (click)="logout()">Logout</button>
-
-<input [(ngModel)]="username" placeholder="Enter Username">
-
-@if (editingId === null) {
-<button (click)="addUser()">Add User</button>
-} @else {
-<button (click)="updateUser()">Update User</button>
-<button (click)="cancelEdit()">Cancel</button>
-}
-
-<p>Current input: {{ username }}</p>
-
-<ul>
-    @for (user of users; track user.id) {
-    <li [class.disabled-user]="user.disabled">
-        <span>
-            {{ user.username }} - Role: {{ user.role }}
-
-            @if (user.disabled) {
-            <strong> - Disabled</strong>
-            }
-        </span>
-
-        @if (canModifyUser(user)) {
-        <button (click)="editUser(user)" [disabled]="user.disabled">
-            Edit
+        <button class="logout-btn" (click)="logout()">
+            Logout
         </button>
+    </header>
 
-        @if (!user.disabled) {
-        <button (click)="disableUser(user.id)">
-            Disable
-        </button>
-        } @else {
-        <button (click)="enableUser(user.id)">
-            Enable
-        </button>
+    @if (canManageUsers()) {
+    <section class="user-form-card">
+        @if (selectedUser) {
+        <app-edit-user-modal [user]="selectedUser" [canModify]="canModifyUser(selectedUser)"
+            [canChangeRole]="isSuperAdmin() && selectedUser.role !== 'super_admin'" (close)="closeUserModal()"
+            (save)="updateUserFromModal($event)" (disable)="disableUser($event)" (enable)="enableUser($event)"
+            (changeRole)="changeRole($event.id, $event.role)"></app-edit-user-modal>
         }
-        }
+        <div class="form-title">
+            <h2>Add New User</h2>
 
-        @if (isSuperAdmin() && user.role !== 'super_admin') {
-        <button (click)="changeRole(user.id, 'user')">
-            Make User
-        </button>
+            <p>
+                New accounts automatically receive the default password:
+                <strong>default</strong>
+            </p>
+        </div>
 
-        <button (click)="changeRole(user.id, 'admin')">
-            Make Admin
-        </button>
-        }
-    </li>
+        <div class="form-controls">
+            <input [(ngModel)]="username" placeholder="Enter Username" class="username-input">
+
+            <button class="primary-btn" (click)="addUser()">
+                Add User
+            </button>
+        </div>
+
+        <p class="current-input">
+            Current input:
+            <strong>{{ username || 'None' }}</strong>
+        </p>
+    </section>
     }
-</ul>
+
+    <section class="users-section">
+        <div class="section-header">
+            <div>
+                <h2>Users List</h2>
+                <p>Total users: {{ users.length }}</p>
+            </div>
+        </div>
+
+        <div class="users-grid">
+            @for (user of users; track user.id) {
+
+            <article class="user-card" [class.disabled-user]="user.disabled">
+                <div class="status-dot" [class.active]="!user.disabled" [class.inactive]="user.disabled"></div>
+
+                <div class="user-card-header">
+                    <div class="avatar">
+                        {{ user.username.charAt(0).toUpperCase() }}
+                    </div>
+
+                    <div class="user-main-info">
+                        <h3>{{ user.username }}</h3>
+
+                        <span class="role-badge" [class.super-admin]="user.role === 'super_admin'"
+                            [class.admin]="user.role === 'admin'" [class.user]="user.role === 'user'">
+                            {{ user.role }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="user-details">
+                    <div class="detail-item">
+                        <span class="label">Status</span>
+
+                        @if (user.disabled) {
+                        <span class="value danger">
+                            Disabled
+                        </span>
+                        } @else {
+                        <span class="value success">
+                            Active
+                        </span>
+                        }
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="label">User ID</span>
+
+                        <span class="value">
+                            #{{ user.id }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="user-actions">
+                    @if (canModifyUser(user)) {
+                    <button class="action-btn edit-btn" (click)="openUserModal(user)">
+                        Manage Account
+                    </button>
+                    }
+                </div>
+            </article>
+
+            }
+        </div>
+    </section>
+
+    @if (selectedUser) {
+    <app-edit-user-modal [user]="selectedUser" [canModify]="canModifyUser(selectedUser)"
+        [canChangeRole]="isSuperAdmin() && selectedUser.role !== 'super_admin'" (close)="closeUserModal()"
+        (save)="updateUserFromModal($event)" (disable)="disableUser($event)" (enable)="enableUser($event)"
+        (changeRole)="changeRole($event.id, $event.role)"></app-edit-user-modal>
+    }
+</div>

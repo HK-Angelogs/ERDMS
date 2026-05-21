@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { Users } from './users/users';
 import { Login } from './login/login';
 import { Register } from './register/register';
+import { Documents } from './documents/documents';
+import { Monitoring } from './monitoring/monitoring';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -9,6 +11,8 @@ export const routes: Routes = [
     { path: 'login', component: Login },
     { path: 'register', component: Register },
     { path: 'users', component: Users },
+    { path: 'documents', component: Documents },
+    { path: 'monitoring', component: Monitoring },
 
     { path: '**', redirectTo: 'login' }
 ];

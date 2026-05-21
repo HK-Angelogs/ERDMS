@@ -1,0 +1,154 @@
+<div class="documents-page">
+    <header class="documents-header">
+        <div>
+            <h1>Document Management</h1>
+            <p>Upload, view, download, categorize, and manage system documents.</p>
+        </div>
+
+        <div class="header-actions">
+            <button class="secondary-btn" (click)="goToUsers()">
+                User Management
+            </button>
+
+            <button class="logout-btn" (click)="logout()">
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <section class="upload-card">
+        <div class="form-title">
+            <h2>Upload Document</h2>
+            <p>Fill in the document details and select a file to upload.</p>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label>Title</label>
+                <input [(ngModel)]="title" placeholder="Enter document title">
+            </div>
+
+            <div class="form-group">
+                <label>Category</label>
+                <select [(ngModel)]="category">
+                    <option value="">Select category</option>
+
+                    @for (item of categories; track item) {
+                    <option [value]="item">
+                        {{ item }}
+                    </option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group full-width">
+                <label>Description</label>
+                <textarea [(ngModel)]="description" placeholder="Enter document description"></textarea>
+            </div>
+
+            <div class="form-group full-width">
+                <label>Document File</label>
+                <input id="documentFile" type="file" (change)="onFileSelected($event)">
+                <small>Allowed: PDF, DOC, DOCX, TXT, PNG, JPG, JPEG. Maximum size: 10MB.</small>
+            </div>
+        </div>
+
+        <button class="primary-btn" (click)="uploadDocument()">
+            Upload Document
+        </button>
+
+        @if (message) {
+        <p class="message">
+            {{ message }}
+        </p>
+        }
+    </section>
+
+    <section class="documents-section">
+        <div class="section-header">
+            <div>
+                <h2>Uploaded Documents</h2>
+                <p>Total documents: {{ filteredDocuments.length }}</p>
+            </div>
+
+            <div class="filter-box">
+                <label>Filter by category</label>
+
+                <select [(ngModel)]="selectedCategory" (change)="applyCategoryFilter()">
+                    <option value="All">All</option>
+
+                    @for (item of categories; track item) {
+                    <option [value]="item">
+                        {{ item }}
+                    </option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        @if (filteredDocuments.length === 0) {
+        <div class="empty-state">
+            No documents found.
+        </div>
+        } @else {
+        <div class="documents-table-wrapper">
+            <table class="documents-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>File Name</th>
+                        <th>Size</th>
+                        <th>Uploaded By</th>
+                        <th>Date Uploaded</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (document of filteredDocuments; track document.id) {
+                    <tr>
+                        <td>
+                            <strong>{{ document.title }}</strong>
+                            <p>{{ document.description || 'No description' }}</p>
+                        </td>
+
+                        <td>
+                            <span class="category-badge">
+                                {{ document.category }}
+                            </span>
+                        </td>
+
+                        <td>{{ document.original_filename }}</td>
+
+                        <td>{{ formatFileSize(document.file_size) }}</td>
+
+                        <td>{{ document.uploaded_by_username || 'Deleted User' }}</td>
+
+                        <td>{{ document.created_at }}</td>
+
+                        <td>
+                            <div class="action-buttons">
+                                <button class="view-btn" (click)="viewDocument(document.id)">
+                                    View
+                                </button>
+
+                                <button class="download-btn" (click)="downloadDocument(document.id)">
+                                    Download
+                                </button>
+
+                                @if (isAdminOrSuperAdmin()) {
+                                <button class="delete-btn" (click)="deleteDocument(document.id)">
+                                    Delete
+                                </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+    </section>
+</div>

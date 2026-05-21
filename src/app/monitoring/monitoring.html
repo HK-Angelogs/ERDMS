@@ -1,0 +1,162 @@
+<div class="monitoring-page">
+    <header class="monitoring-header">
+        <div>
+            <h1>System Monitoring</h1>
+            <p>View user activity logs, audit trails, and login/logout history.</p>
+        </div>
+
+        <div class="header-actions">
+            <button class="secondary-btn" (click)="goToUsers()">
+                User Management
+            </button>
+
+            <button class="secondary-btn" (click)="goToDocuments()">
+                Document Management
+            </button>
+
+            <button class="logout-btn" (click)="logout()">
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <section class="summary-grid">
+        <div class="summary-card">
+            <span>Total Logs</span>
+            <strong>{{ logs.length }}</strong>
+        </div>
+
+        <div class="summary-card">
+            <span>Filtered Logs</span>
+            <strong>{{ filteredLogs.length }}</strong>
+        </div>
+
+        <div class="summary-card">
+            <span>Modules</span>
+            <strong>{{ modules.length }}</strong>
+        </div>
+
+        <div class="summary-card">
+            <span>Actions</span>
+            <strong>{{ actions.length }}</strong>
+        </div>
+    </section>
+
+    <section class="filter-card">
+        <div class="filter-group">
+            <label>Filter by Module</label>
+
+            <select [(ngModel)]="selectedModule" (change)="applyFilters()">
+                <option value="All">All</option>
+
+                @for (module of modules; track module) {
+                <option [value]="module">
+                    {{ module }}
+                </option>
+                }
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Filter by Action</label>
+
+            <select [(ngModel)]="selectedAction" (change)="applyFilters()">
+                <option value="All">All</option>
+
+                @for (action of actions; track action) {
+                <option [value]="action">
+                    {{ action }}
+                </option>
+                }
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Search Username</label>
+
+            <input [(ngModel)]="searchUsername" (input)="applyFilters()" placeholder="Enter username">
+        </div>
+
+        <button class="reset-btn" (click)="resetFilters()">
+            Reset Filters
+        </button>
+    </section>
+
+    @if (message) {
+    <p class="message">
+        {{ message }}
+    </p>
+    }
+
+    <section class="logs-section">
+        <div class="section-header">
+            <div>
+                <h2>Activity Logs</h2>
+                <p>Admin and super admin only.</p>
+            </div>
+
+            <button class="refresh-btn" (click)="loadActivityLogs()">
+                Refresh
+            </button>
+        </div>
+
+        @if (filteredLogs.length === 0) {
+        <div class="empty-state">
+            No activity logs found.
+        </div>
+        } @else {
+        <div class="table-wrapper">
+            <table class="logs-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                        <th>Module</th>
+                        <th>Details</th>
+                        <th>IP Address</th>
+                        <th>Date / Time</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (log of filteredLogs; track log.id) {
+                    <tr>
+                        <td>#{{ log.id }}</td>
+
+                        <td>
+                            <strong>{{ log.username || 'Unknown' }}</strong>
+                            <small>User ID: {{ log.user_id || 'N/A' }}</small>
+                        </td>
+
+                        <td>
+                            <span class="role-badge" [class.super-admin]="log.role === 'super_admin'"
+                                [class.admin]="log.role === 'admin'" [class.user]="log.role === 'user'">
+                                {{ log.role || 'N/A' }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="action-badge">
+                                {{ log.action }}
+                            </span>
+                        </td>
+
+                        <td>{{ log.module }}</td>
+
+                        <td class="details-cell">
+                            {{ log.details || 'No details' }}
+                        </td>
+
+                        <td>{{ log.ip_address || 'N/A' }}</td>
+
+                        <td>{{ formatDate(log.created_at) }}</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        }
+    </section>
+</div>

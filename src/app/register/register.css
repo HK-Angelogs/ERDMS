@@ -15,7 +15,7 @@
 /* Glass card */
 .login-card {
     width: 100%;
-    max-width: 420px;
+    max-width: 440px;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -79,6 +79,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    width: 95%;
 }
 
 .input-wrapper input {
@@ -214,6 +215,7 @@
     transition: 0.3s ease;
     box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
     margin-bottom: 24px;
+    margin-left: 5px;
 }
 
 .login-btn:hover {

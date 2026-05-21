@@ -1564,7 +1564,6 @@
 │   ├── package.json
 │   ├── package-lock.json
 │   └── server.js
-├── fullstack-project.zip
 ├── node_modules
 │   ├── abbrev
 │   │   ├── lib
@@ -26563,6 +26562,11 @@
 │   │   │   ├── register.spec.ts
 │   │   │   └── register.ts
 │   │   └── users
+│   │       ├── edit-user-modal
+│   │       │   ├── edit-user-modal.css
+│   │       │   ├── edit-user-modal.html
+│   │       │   ├── edit-user-modal.spec.ts
+│   │       │   └── edit-user-modal.ts
 │   │       ├── users.css
 │   │       ├── users.html
 │   │       ├── users.spec.ts
@@ -26575,4 +26579,4 @@
 ├── tsconfig.json
 └── tsconfig.spec.json
 
-2602 directories, 23974 files
+2603 directories, 23977 files

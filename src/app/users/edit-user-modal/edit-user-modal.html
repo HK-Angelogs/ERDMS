@@ -1,0 +1,80 @@
+<div class="modal-backdrop" (click)="closeModal()">
+    <section class="modal-card" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+            <div>
+                <h2>Manage User</h2>
+                <p>Edit username, password, account status, and role.</p>
+            </div>
+
+            <button class="close-btn" (click)="closeModal()">×</button>
+        </header>
+
+        <div class="user-summary">
+            <div class="avatar">
+                {{ user?.username?.charAt(0).toUpperCase() }}
+            </div>
+
+            <div>
+                <h3>{{ user?.username }}</h3>
+                <span class="role-badge">
+                    {{ user?.role }}
+                </span>
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <label>
+                Username
+                <input [(ngModel)]="username" type="text" placeholder="Enter username" [disabled]="!canModify">
+            </label>
+
+            <label>
+                New Password
+                <input [(ngModel)]="password" type="text" placeholder="Leave blank to keep current password"
+                    [disabled]="!canModify">
+            </label>
+        </div>
+
+        <div class="status-box">
+            <span>Account Status</span>
+
+            @if (user?.disabled) {
+            <strong class="danger">Disabled</strong>
+            } @else {
+            <strong class="success">Active</strong>
+            }
+        </div>
+
+        <div class="modal-actions">
+            @if (canModify) {
+            <button class="primary-btn" (click)="submitUpdate()">
+                Save Changes
+            </button>
+
+            @if (!user?.disabled) {
+            <button class="danger-btn" (click)="disableUser()">
+                Disable Account
+            </button>
+            } @else {
+            <button class="success-btn" (click)="enableUser()">
+                Enable Account
+            </button>
+            }
+            }
+
+            @if (canChangeRole) {
+            <button class="secondary-btn" (click)="makeUser()">
+                Make User
+            </button>
+
+            <button class="secondary-btn purple" (click)="makeAdmin()">
+                Make Admin
+            </button>
+            }
+
+            <button class="ghost-btn" (click)="closeModal()">
+                Cancel
+            </button>
+        </div>
+    </section>
+</div>

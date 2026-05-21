@@ -1,0 +1,252 @@
+.monitoring-page {
+    min-height: 100vh;
+    padding: 32px;
+    background: #f4f7fb;
+    color: #1f2937;
+}
+
+.monitoring-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.monitoring-header h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.monitoring-header p {
+    margin: 6px 0 0;
+    color: #6b7280;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.secondary-btn,
+.logout-btn,
+.reset-btn,
+.refresh-btn {
+    border: none;
+    border-radius: 12px;
+    padding: 11px 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.secondary-btn {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+.logout-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.reset-btn {
+    background: #6b7280;
+    color: white;
+    align-self: end;
+}
+
+.refresh-btn {
+    background: #2563eb;
+    color: white;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.summary-card span {
+    display: block;
+    color: #6b7280;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.summary-card strong {
+    font-size: 32px;
+}
+
+.filter-card,
+.logs-section {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    margin-bottom: 24px;
+}
+
+.filter-card {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-weight: 700;
+}
+
+.filter-group input,
+.filter-group select {
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 15px;
+    outline: none;
+}
+
+.message {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 14px 18px;
+    border-radius: 14px;
+    font-weight: 700;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.section-header p {
+    margin: 6px 0 0;
+    color: #6b7280;
+}
+
+.empty-state {
+    padding: 28px;
+    border-radius: 16px;
+    background: #f9fafb;
+    text-align: center;
+    color: #6b7280;
+    font-weight: 700;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.logs-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.logs-table th,
+.logs-table td {
+    padding: 14px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    vertical-align: top;
+}
+
+.logs-table th {
+    background: #f9fafb;
+    color: #374151;
+    font-size: 14px;
+}
+
+.logs-table td small {
+    display: block;
+    margin-top: 4px;
+    color: #6b7280;
+}
+
+.role-badge,
+.action-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.role-badge.super-admin {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+.role-badge.admin {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.role-badge.user {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.action-badge {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.details-cell {
+    max-width: 320px;
+    line-height: 1.4;
+}
+
+@media (max-width: 1000px) {
+    .summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .filter-card {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .monitoring-page {
+        padding: 18px;
+    }
+
+    .monitoring-header,
+    .section-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .summary-grid,
+    .filter-card {
+        grid-template-columns: 1fr;
+    }
+
+    .header-actions {
+        flex-direction: column;
+    }
+}
