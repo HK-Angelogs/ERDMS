@@ -14,6 +14,7 @@ export class Login implements AfterViewInit, OnDestroy {
   username = '';
   password = '';
   message = '';
+  showPassword = false;
 
   private animationTimers: number[] = [];
 
@@ -81,7 +82,7 @@ export class Login implements AfterViewInit, OnDestroy {
       next: (response) => {
         this.authService.saveToken(response.token);
         this.authService.saveUser(response.user);
-        this.router.navigate(['/users']);
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         this.message = err.error?.message || 'Login failed';

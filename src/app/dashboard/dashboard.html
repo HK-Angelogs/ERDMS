@@ -1,0 +1,130 @@
+<div class="dashboard-page">
+
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Welcome back, {{userRole}} {{ userName }}!</p>
+        </div>
+
+        <div class="header-actions">
+
+            <button class="logout-btn" (click)="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="message" *ngIf="loading">Loading dashboard data...</div>
+    <div class="message error" *ngIf="error">{{ error }}</div>
+
+    <ng-container *ngIf="!loading && stats">
+
+        @if (userRole !== 'user') {
+        <!-- Stat Cards -->
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-icon users-icon">👥</div>
+                <div class="stat-info">
+                    <span>Total Users</span>
+                    <strong>{{ stats.totalUsers }}</strong>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon docs-icon">📄</div>
+                <div class="stat-info">
+                    <span>Total Documents</span>
+                    <strong>{{ stats.totalDocuments }}</strong>
+                </div>
+            </div>
+
+        </div>
+        }
+
+        <!-- Quick Access -->
+        <div class="dashboard-card quick-access-card">
+            <div class="card-header">
+                <div>
+                    <h2>Quick Access</h2>
+                </div>
+            </div>
+            <div class="quick-nav-grid">
+                <a routerLink="/users" class="quick-nav-item">
+                    <span class="nav-icon">👤</span>
+                    <div>
+                        <strong>Manage Users</strong>
+                        <small>View, edit, and manage user accounts</small>
+                    </div>
+                </a>
+                <a routerLink="/documents" class="quick-nav-item">
+                    <span class="nav-icon">📁</span>
+                    <div>
+                        <strong>Manage Documents</strong>
+                        <small>Upload, view, and delete documents</small>
+                    </div>
+                </a>
+                @if (userRole !== 'user') {
+                <a routerLink="/monitoring" class="quick-nav-item">
+                    <span class="nav-icon">📊</span>
+                    <div>
+                        <strong>Activity Monitoring</strong>
+                        <small>Track system and user activity logs</small>
+                    </div>
+                </a>
+                }
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        @if (userRole !== 'user') {
+        <div class="dashboard-card">
+            <div class="card-header">
+                <div>
+                    <h2>Recent Activity</h2>
+                    <p>Last 10 system events</p>
+                </div>
+                <span class="count-badge">{{ stats.recentActivities.length }} entries</span>
+            </div>
+
+            <div class="empty-state" *ngIf="stats.recentActivities.length === 0">
+                No recent activity found.
+            </div>
+
+            <div class="table-wrapper" *ngIf="stats.recentActivities.length > 0">
+                <table class="activity-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Action</th>
+                            <th>Module</th>
+                            <th>Details</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let activity of stats.recentActivities">
+                            <td><strong>{{ activity.username }}</strong></td>
+                            <td>
+                                <span class="role-badge" [class.super-admin]="activity.role === 'super_admin'"
+                                    [class.admin]="activity.role === 'admin'" [class.user]="activity.role === 'user'">
+                                    {{ activity.role }}
+                                </span>
+                            </td>
+                            <td><span class="action-badge">{{ activity.action }}</span></td>
+                            <td>{{ activity.module }}</td>
+                            <td class="details-cell">{{ activity.details }}</td>
+                            <td>
+                                <small>{{ activity.created_at | date:'MMM d, y' }}</small>
+                                <small>{{ activity.created_at | date:'h:mm a' }}</small>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div> }
+
+    </ng-container>
+
+</div>

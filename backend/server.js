@@ -9,8 +9,10 @@ const multer = require('multer');
 
 const app = express();
 
+
 const PORT = 3000;
 const JWT_SECRET = 'secret_key';
+
 
 // Middleware: allows Express to read JSON body from Postman
 app.use(cors());
@@ -47,6 +49,10 @@ db.connect((err) => {
 app.get('/', (req, res) => {
     res.send('API server is running');
 });
+
+// Dashboard Routes
+const dashboardRoutes = require('./routes/dashboard')(db);
+app.use('/api/dashboard', verifyToken, dashboardRoutes);
 
 // ACTIVITY LOGGING FUNCTION
 function logActivity(req, action, module, details) {
@@ -629,7 +635,7 @@ app.get('/users/:id', (req, res) => {
 
 
 // DISABLE USER
-app.put('/disable-user/:id', verifyToken, verifySelfOrAdminOverUser, (req, res) => {
+app.put('/disable-user/:id', verifyToken, verifyAdminOrSuperAdmin, (req, res) => {
     const { id } = req.params;
 
     db.query(

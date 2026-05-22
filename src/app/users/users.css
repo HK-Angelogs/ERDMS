@@ -105,6 +105,7 @@
 }
 
 .primary-btn,
+
 .secondary-btn {
     padding: 14px 18px;
     border-radius: 12px;
@@ -112,6 +113,7 @@
     cursor: pointer;
     font-weight: 800;
     transition: 0.2s ease;
+    margin-right: 8px;
 }
 
 .primary-btn {
@@ -419,5 +421,11 @@
         align-items: flex-start;
         flex-direction: column;
         gap: 12px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
     }
 }

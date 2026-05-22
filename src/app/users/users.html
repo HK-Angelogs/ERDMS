@@ -5,9 +5,16 @@
             <p>Manage users, account status, and role permissions.</p>
         </div>
 
-        <button class="logout-btn" (click)="logout()">
-            Logout
-        </button>
+        <div class="header-actions">
+            <button class="secondary-btn" (click)="goToDashboard()">
+                Back to Dashboard
+            </button>
+
+            <button class="logout-btn" (click)="logout()">
+                Logout
+            </button>
+        </div>
+
     </header>
 
     @if (canManageUsers()) {

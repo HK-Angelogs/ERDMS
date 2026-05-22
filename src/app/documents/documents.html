@@ -6,8 +6,8 @@
         </div>
 
         <div class="header-actions">
-            <button class="secondary-btn" (click)="goToUsers()">
-                User Management
+            <button class="secondary-btn" (click)="goToDashboard()">
+                Back to Dashboard
             </button>
 
             <button class="logout-btn" (click)="logout()">
@@ -16,6 +16,8 @@
         </div>
     </header>
 
+    @if (userRole !== 'user') {
+    <!-- UPLOAD DOCUMENT  -->
     <section class="upload-card">
         <div class="form-title">
             <h2>Upload Document</h2>
@@ -63,6 +65,7 @@
         </p>
         }
     </section>
+    }
 
     <section class="documents-section">
         <div class="section-header">

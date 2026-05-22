@@ -189,6 +189,10 @@ export class Users implements OnInit {
     });
   }
 
+  goToDashboard() {
+    this.router.navigate(['/dashboard']);
+  }
+
   logout() {
     localStorage.removeItem('token');
     this.router.navigate(['/login']);

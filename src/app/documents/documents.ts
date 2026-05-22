@@ -209,8 +209,8 @@ export class Documents implements OnInit {
     return `${mb.toFixed(2)} MB`;
   }
 
-  goToUsers() {
-    this.router.navigate(['/users']);
+  goToDashboard() {
+    this.router.navigate(['/dashboard']);
   }
 
   logout() {
@@ -218,4 +218,9 @@ export class Documents implements OnInit {
     localStorage.removeItem('user');
     this.router.navigate(['/login']);
   }
+
+  get userRole(): string | null {
+    return this.authService.getRole();
+  }
+
 }

@@ -126,6 +126,10 @@ export class Monitoring implements OnInit {
     this.router.navigate(['/users']);
   }
 
+  goToDashboard() {
+    this.router.navigate(['/dashboard']);
+  }
+
   goToDocuments() {
     this.router.navigate(['/documents']);
   }
