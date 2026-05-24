@@ -1043,6 +1043,61 @@ app.get('/activity-logs', verifyToken, (req, res) => {
     });
 });
 
+app.post('/change-password', verifyToken, async (req, res) => {
+    try {
+        const { newPassword } = req.body;
+        const userId = req.user.id;
+
+        if (!newPassword || newPassword.trim() === '') {
+            return res.status(400).json({
+                message: 'New password is required'
+            });
+        }
+
+        // 1. Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        const sql = 'UPDATE users SET password = ? WHERE id = ?';
+        const values = [hashedPassword, userId];
+
+        // 2. Update the user's password using the callback pattern
+        db.query(sql, values, (err, result) => {
+            if (err) {
+                return res.status(500).json({
+                    message: 'Failed to update password',
+                    error: err.message
+                });
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({
+                    message: 'User not found'
+                });
+            }
+
+            // 3. Log the password change activity
+            logActivity(
+                req,
+                'CHANGE_PASSWORD',
+                'Authentication',
+                `User ID: ${userId} updated their default password`
+            );
+
+            // 4. Send a success response back to Angular
+            res.status(200).json({
+                message: 'Password updated successfully'
+            });
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+});
+
 // Start server
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

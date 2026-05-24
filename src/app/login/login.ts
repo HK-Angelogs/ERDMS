@@ -1,3 +1,4 @@
+// Imports
 import { Component, AfterViewInit, ElementRef, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -69,6 +70,7 @@ export class Login implements AfterViewInit, OnDestroy {
     });
   }
 
+  // Login-Method
   login() {
     if (!this.username || !this.password) {
       this.message = 'Please enter username and password';
@@ -80,10 +82,33 @@ export class Login implements AfterViewInit, OnDestroy {
       password: this.password
     }).subscribe({
       next: (response) => {
+        // ADD THIS CONSOLE LOG:
+        console.log('Backend Response:', response);
+
+        // 1. Grab the user object from the response
+        const userToSave = response.user;
+
+        // 2. Check the password the user JUST typed into the login form
+        if (this.password === 'default') {
+          userToSave.isdefaultPassword = true;
+        } else {
+          userToSave.isdefaultPassword = false;
+        }
+
         this.authService.saveToken(response.token);
         this.authService.saveUser(response.user);
-        this.router.navigate(['/dashboard']);
+
+        // Check if the user needs to change their password
+        if (this.authService.requiresPasswordChange()) {
+          console.log('Routing to change-password');
+          this.router.navigate(['/change-password']);
+        } else {
+          console.log('Routing to dashboard');
+          this.router.navigate(['/dashboard']);
+        }
       },
+
+
       error: (err) => {
         this.message = err.error?.message || 'Login failed';
       }

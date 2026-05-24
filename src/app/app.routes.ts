@@ -5,16 +5,20 @@ import { Register } from './register/register';
 import { Documents } from './documents/documents';
 import { Monitoring } from './monitoring/monitoring';
 import { DashboardComponent } from './dashboard/dashboard';
+import { changePassword } from './change-password/change-password';
+import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
 
     { path: 'login', component: Login },
-    { path: 'dashboard', component: DashboardComponent, },
     { path: 'register', component: Register },
+    { path: 'change-password', component: changePassword },
     { path: 'users', component: Users },
-    { path: 'documents', component: Documents },
-    { path: 'monitoring', component: Monitoring },
+    { path: 'documents', component: Documents, canActivate: [authGuard] },
+    { path: 'monitoring', component: Monitoring, canActivate: [authGuard] },
+    { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+    { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
 
     { path: '**', redirectTo: 'login' }
 ];
