@@ -102,7 +102,7 @@ export class Users implements OnInit {
       return;
     }
 
-    this.http.post(`${this.apiUrl}/add-user`, {
+    this.http.post(`${this.apiUrl}/users/add-user`, {
       username: this.username
     }, this.getAuthHeaders()).subscribe({
       next: () => {
@@ -131,7 +131,7 @@ export class Users implements OnInit {
       return;
     }
 
-    this.http.put(`${this.apiUrl}/update-user/${data.id}`, {
+    this.http.put(`${this.apiUrl}/users/update-user/${data.id}`, {
       username: data.username,
       password: data.password
     }, this.getAuthHeaders()).subscribe({
@@ -147,7 +147,7 @@ export class Users implements OnInit {
   }
 
   disableUser(id: number) {
-    this.http.put(`${this.apiUrl}/disable-user/${id}`, {}, this.getAuthHeaders()).subscribe({
+    this.http.put(`${this.apiUrl}/users/disable-user/${id}`, {}, this.getAuthHeaders()).subscribe({
       next: () => {
         this.selectedUser = null;
         this.loadUsers();
@@ -160,7 +160,7 @@ export class Users implements OnInit {
   }
 
   enableUser(id: number) {
-    this.http.put(`${this.apiUrl}/enable-user/${id}`, {}, this.getAuthHeaders()).subscribe({
+    this.http.put(`${this.apiUrl}/users/enable-user/${id}`, {}, this.getAuthHeaders()).subscribe({
       next: () => {
         this.selectedUser = null;
         this.loadUsers();

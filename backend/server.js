@@ -8,6 +8,7 @@ const userRoutes = require('./routes/users');
 const documentRoutes = require('./routes/documents');
 const activityLogRoutes = require('./routes/activityLogs');
 const dashboardRoutes = require('./routes/dashboard');
+const folderRoutes = require('./routes/folders');
 
 const app = express();
 const PORT = 3000;
@@ -39,6 +40,7 @@ app.use('/users', userRoutes);
 app.use('/documents', documentRoutes);
 app.use('/activity-logs', activityLogRoutes);
 app.use('/api/dashboard', verifyToken, dashboardRoutes);
+app.use('/folders', folderRoutes);
 
 // ─── START ────────────────────────────────────────────────────────────────────
 

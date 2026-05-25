@@ -55,6 +55,18 @@ export class DocumentService {
         );
     }
 
+    // ─── MOVE DOCUMENT TO FOLDER ──────────────────────────────────────────────
+    // Reassigns a document to a different folder within the same category.
+    // Pass null as folderId to unassign the document from its current folder.
+
+    moveDocumentToFolder(docId: number, folderId: number | null): Observable<any> {
+        return this.http.put(
+            `${this.apiUrl}/documents/${docId}/folder`,
+            { folder_id: folderId },
+            this.getAuthHeaders()
+        );
+    }
+
     getViewUrl(id: number): string {
         return `${this.apiUrl}/documents/${id}/view`;
     }

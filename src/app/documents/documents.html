@@ -17,7 +17,7 @@
     </header>
 
     @if (userRole !== 'user') {
-    <!-- UPLOAD DOCUMENT  -->
+    <!-- UPLOAD DOCUMENT -->
     <section class="upload-card">
         <div class="form-title">
             <h2>Upload Document</h2>
@@ -67,6 +67,7 @@
     </section>
     }
 
+    <!-- DOCUMENTS TABLE -->
     <section class="documents-section">
         <div class="section-header">
             <div>
@@ -174,4 +175,379 @@
         </div>
         }
     </section>
+
+    <!-- ─── FOLDER MANAGEMENT ─────────────────────────────────────────────── -->
+
+    <section class="folders-section">
+        <div class="section-header">
+            <div>
+                <h2>Folder Management</h2>
+                <p>Organize documents into folders within each category.</p>
+            </div>
+        </div>
+
+        @if (folderTreeLoading) {
+        <div class="empty-state">
+            Loading folders…
+        </div>
+        } @else if (folderTreeError) {
+        <div class="empty-state folder-error">
+            {{ folderTreeError }}
+        </div>
+        } @else if (categoryTrees.length === 0) {
+        <div class="empty-state">
+            No folders found.
+        </div>
+        } @else {
+        <div class="folder-tree">
+            @for (cat of categoryTrees; track cat.id) {
+
+            <!-- CATEGORY ROW -->
+            <div class="folder-category-block">
+                <div class="folder-category-header" (click)="toggleCategory(cat.id)">
+                    <span class="folder-toggle-icon">
+                        {{ isCategoryExpanded(cat.id) ? '▾' : '▸' }}
+                    </span>
+                    <span class="folder-category-name">{{ cat.name }}</span>
+                    <span class="folder-category-count">
+                        {{ cat.tree.length }} folder{{ cat.tree.length !== 1 ? 's' : '' }}
+                    </span>
+                    @if (userRole !== 'user') {
+                    <button class="folder-action-btn folder-add-btn"
+                        (click)="$event.stopPropagation(); openCreateFolderModal(cat.id, null)"
+                        title="Add folder in {{ cat.name }}">
+                        + New Folder
+                    </button>
+                    }
+                </div>
+
+                @if (isCategoryExpanded(cat.id)) {
+                <div class="folder-children-container">
+                    @if (cat.tree.length === 0) {
+                    <div class="folder-empty">No folders in this category.</div>
+                    } @else {
+                    <ng-container
+                        *ngTemplateOutlet="folderNodeTpl; context: { nodes: cat.tree, categoryId: cat.id, depth: 0 }">
+                    </ng-container>
+                    }
+                </div>
+                }
+            </div>
+
+            }
+        </div>
+        }
+    </section>
+
+    <!-- ─── RECURSIVE FOLDER NODE TEMPLATE ───────────────────────────────── -->
+
+    <ng-template #folderNodeTpl let-nodes="nodes" let-categoryId="categoryId" let-depth="depth">
+        @for (folder of nodes; track folder.id) {
+        <div class="folder-node" [style.padding-left.px]="depth * 20">
+
+            <div class="folder-row">
+                <!-- Expand toggle — only shown when folder has children -->
+                <button class="folder-toggle-btn" [class.invisible]="folder.children.length === 0"
+                    (click)="toggleFolder(folder.id)"
+                    [attr.aria-label]="isFolderExpanded(folder.id) ? 'Collapse ' + folder.name : 'Expand ' + folder.name">
+                    {{ isFolderExpanded(folder.id) ? '▾' : '▸' }}
+                </button>
+
+                <!-- Clicking the icon or name opens the folder popup -->
+                <span class="folder-icon" (click)="openFolderPopup(folder)" style="cursor:pointer">📁</span>
+
+                <span class="folder-name" (click)="openFolderPopup(folder)">
+                    {{ folder.name }}
+                </span>
+
+                @if (userRole !== 'user') {
+                <!-- FOLDER ACTIONS -->
+                <div class="folder-inline-actions">
+                    <button class="folder-action-btn folder-add-btn" (click)="openCreateFolderModal(categoryId, folder)"
+                        title="Add subfolder">
+                        + Sub
+                    </button>
+                    <button class="folder-action-btn folder-rename-btn" (click)="openRenameFolderModal(folder)"
+                        title="Rename folder">
+                        Rename
+                    </button>
+                    <button class="folder-action-btn folder-move-btn" (click)="openMoveFolderModal(folder)"
+                        title="Move folder">
+                        Move
+                    </button>
+                    <button class="folder-action-btn folder-delete-btn" (click)="openDeleteFolderModal(folder)"
+                        title="Delete folder">
+                        Delete
+                    </button>
+                </div>
+                }
+            </div>
+
+
+            <!-- RECURSIVE CHILDREN -->
+            @if (isFolderExpanded(folder.id) && folder.children.length > 0) {
+            <ng-container
+                *ngTemplateOutlet="folderNodeTpl; context: { nodes: folder.children, categoryId: categoryId, depth: depth + 1 }">
+            </ng-container>
+            }
+        </div>
+        }
+    </ng-template>
+
+    <!-- ─── CREATE FOLDER MODAL ───────────────────────────────────────────── -->
+    @if (userRole !== 'user') {
+    @if (showCreateFolderModal) {
+    <div class="modal-overlay" (click)="closeCreateFolderModal()">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>New Folder</h3>
+                <button class="modal-close-btn" (click)="closeCreateFolderModal()">✕</button>
+            </div>
+
+            <p class="modal-subtitle">
+                Creating inside: <strong>{{ createFolderParentLabel }}</strong>
+            </p>
+
+            <div class="form-group">
+                <label>Folder Name</label>
+                <input [(ngModel)]="createFolderName" placeholder="Enter folder name"
+                    (keyup.enter)="submitCreateFolder()">
+            </div>
+
+            @if (createFolderError) {
+            <p class="modal-error">{{ createFolderError }}</p>
+            }
+
+            <div class="modal-actions">
+                <button class="secondary-btn" (click)="closeCreateFolderModal()">Cancel</button>
+                <button class="primary-btn modal-submit-btn" (click)="submitCreateFolder()"
+                    [disabled]="createFolderLoading">
+                    {{ createFolderLoading ? 'Creating…' : 'Create Folder' }}
+                </button>
+            </div>
+        </div>
+    </div>
+    }}
+
+    <!-- ─── RENAME FOLDER MODAL ───────────────────────────────────────────── -->
+    @if (userRole !== 'user') {
+    @if (showRenameFolderModal) {
+    <div class="modal-overlay" (click)="closeRenameFolderModal()">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Rename Folder</h3>
+                <button class="modal-close-btn" (click)="closeRenameFolderModal()">✕</button>
+            </div>
+
+            <div class="form-group">
+                <label>New Name</label>
+                <input [(ngModel)]="renameFolderName" placeholder="Enter new folder name"
+                    (keyup.enter)="submitRenameFolder()">
+            </div>
+
+            @if (renameFolderError) {
+            <p class="modal-error">{{ renameFolderError }}</p>
+            }
+
+            <div class="modal-actions">
+                <button class="secondary-btn" (click)="closeRenameFolderModal()">Cancel</button>
+                <button class="primary-btn modal-submit-btn" (click)="submitRenameFolder()"
+                    [disabled]="renameFolderLoading">
+                    {{ renameFolderLoading ? 'Saving…' : 'Save' }}
+                </button>
+            </div>
+        </div>
+    </div>
+    }}
+
+    <!-- ─── DELETE FOLDER MODAL ───────────────────────────────────────────── -->
+
+    @if (showDeleteFolderModal) {
+    <div class="modal-overlay" (click)="closeDeleteFolderModal()">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Delete Folder</h3>
+                <button class="modal-close-btn" (click)="closeDeleteFolderModal()">✕</button>
+            </div>
+
+            <p class="modal-subtitle">
+                Are you sure you want to delete
+                <strong>{{ deleteFolderTarget?.name }}</strong>?
+                This action cannot be undone.
+            </p>
+
+            <p class="modal-warning">
+                The folder must be empty (no subfolders and no documents) before it can be deleted.
+            </p>
+
+            @if (deleteFolderError) {
+            <p class="modal-error">{{ deleteFolderError }}</p>
+            }
+
+            <div class="modal-actions">
+                <button class="secondary-btn" (click)="closeDeleteFolderModal()">Cancel</button>
+                <button class="delete-btn modal-submit-btn" (click)="submitDeleteFolder()"
+                    [disabled]="deleteFolderLoading">
+                    {{ deleteFolderLoading ? 'Deleting…' : 'Delete Folder' }}
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- ─── MOVE FOLDER MODAL ─────────────────────────────────────────────── -->
+
+    @if (showMoveFolderModal) {
+    <div class="modal-overlay" (click)="closeMoveFolderModal()">
+        <div class="modal-card" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Move Folder</h3>
+                <button class="modal-close-btn" (click)="closeMoveFolderModal()">✕</button>
+            </div>
+
+            <p class="modal-subtitle">
+                Moving: <strong>{{ moveFolderTarget?.name }}</strong>
+            </p>
+
+            <div class="form-group">
+                <label>Destination</label>
+                <select [(ngModel)]="moveFolderSelectedDestination">
+                    <option [ngValue]="null" disabled>Select destination…</option>
+                    @for (dest of moveFolderDestinations; track dest.id) {
+                    <option [ngValue]="dest.id">{{ dest.label }}</option>
+                    }
+                </select>
+            </div>
+
+            @if (moveFolderError) {
+            <p class="modal-error">{{ moveFolderError }}</p>
+            }
+
+            <div class="modal-actions">
+                <button class="secondary-btn" (click)="closeMoveFolderModal()">Cancel</button>
+                <button class="primary-btn modal-submit-btn" (click)="submitMoveFolder()"
+                    [disabled]="moveFolderLoading">
+                    {{ moveFolderLoading ? 'Moving…' : 'Move Folder' }}
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- ─── FOLDER POPUP ──────────────────────────────────────────────────── -->
+
+    @if (showFolderPopup && folderPopupTarget) {
+    <app-edit-folder-modal [folder]="folderPopupTarget" [files]="folderPopupFiles" [loading]="folderPopupLoading"
+        [error]="folderPopupError" [forbidden]="folderPopupForbidden" [activeTab]="folderPopupActiveTab"
+        [categoryName]="getCategoryName(folderPopupTarget.category_id)" [permissions]="folderPermissions"
+        [permissionsLoading]="folderPermissionsLoading" [permissionsError]="folderPermissionsError"
+        [permissionsSaving]="folderPermissionsSaving" [permRoleUser]="folderPermRoleUser" [permUsers]="folderPermUsers"
+        [isAdmin]="isAdminOrSuperAdmin()" (closeModal)="closeFolderPopup()" (tabChange)="setFolderPopupTab($event)"
+        (openMoveDoc)="openMoveDocModal($event)" (fileRightClick)="onModalFileRightClick($event)"
+        (permRoleUserChange)="folderPermRoleUser = $event" (savePermissions)="submitFolderPermissions()">
+    </app-edit-folder-modal>
+    }
+
+    <!-- ─── CONTEXT MENU ──────────────────────────────────────────────────── -->
+
+    @if (showContextMenu && contextMenuDocument) {
+    <div class="context-menu" [style.left.px]="contextMenuX" [style.top.px]="contextMenuY"
+        (click)="$event.stopPropagation()">
+        <button class="context-menu-item" (click)="viewDocument(contextMenuDocument.id); closeContextMenu()">
+            👁 View
+        </button>
+        <button class="context-menu-item" (click)="downloadDocument(contextMenuDocument.id); closeContextMenu()">
+            ⬇ Download
+        </button>
+        @if (isAdminOrSuperAdmin()) {
+        <button class="context-menu-item" (click)="openMoveDocModal(contextMenuDocument)">
+            📂 Move to Folder
+        </button>
+        <div class="context-menu-divider"></div>
+        <button class="context-menu-item danger" (click)="openPopupDeleteConfirm(contextMenuDocument)">
+            🗑 Delete
+        </button>
+        }
+    </div>
+    }
+
+    <!-- ─── DELETE DOCUMENT CONFIRMATION (inside popup) ──────────────────── -->
+
+    @if (showPopupDeleteConfirm && popupDeleteTarget) {
+    <div class="sub-modal-overlay" (click)="closePopupDeleteConfirm()">
+        <div class="sub-modal-card" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Delete Document</h3>
+                <button class="modal-close-btn" (click)="closePopupDeleteConfirm()">✕</button>
+            </div>
+
+            <p class="modal-subtitle">
+                Are you sure you want to permanently delete
+                <strong>{{ popupDeleteTarget.original_filename }}</strong>?
+                This cannot be undone.
+            </p>
+
+            @if (popupDeleteError) {
+            <p class="modal-error">{{ popupDeleteError }}</p>
+            }
+
+            <div class="modal-actions">
+                <button class="secondary-btn" (click)="closePopupDeleteConfirm()">Cancel</button>
+                <button class="delete-btn modal-submit-btn" (click)="confirmPopupDelete()"
+                    [disabled]="popupDeleteLoading">
+                    {{ popupDeleteLoading ? 'Deleting…' : 'Delete' }}
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- ─── MOVE DOCUMENT MODAL ───────────────────────────────────────────── -->
+
+    @if (showMoveDocModal && moveDocTarget) {
+    <div class="sub-modal-overlay" (click)="closeMoveDocModal()">
+        <div class="sub-modal-card" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Move Document</h3>
+                <button class="modal-close-btn" (click)="closeMoveDocModal()">✕</button>
+            </div>
+
+            <p class="modal-subtitle">
+                Moving: <strong>{{ moveDocTarget.title }}</strong>
+            </p>
+            <p class="modal-subtitle" style="margin-top: 4px; font-size: 13px;">
+                Category: <strong>{{ moveDocTarget.category }}</strong> — only folders in this category are shown.
+            </p>
+
+            <div class="form-group" style="margin-top: 12px;">
+                <label>Destination Folder</label>
+                <select [(ngModel)]="moveDocSelectedFolderId">
+                    <option [ngValue]="null" disabled>Select a folder…</option>
+                    @for (opt of moveDocFolderOptions; track opt.id) {
+                    <option [ngValue]="opt.id">{{ opt.label }}</option>
+                    }
+                </select>
+            </div>
+
+            @if (moveDocFolderOptions.length === 0) {
+            <p class="modal-subtitle" style="color: #dc2626; margin-top: 8px;">
+                No folders exist in the "{{ moveDocTarget.category }}" category.
+            </p>
+            }
+
+            @if (moveDocError) {
+            <p class="modal-error">{{ moveDocError }}</p>
+            }
+
+            <div class="modal-actions">
+                <button class="secondary-btn" (click)="closeMoveDocModal()">Cancel</button>
+                <button class="primary-btn modal-submit-btn" (click)="submitMoveDoc()"
+                    [disabled]="moveDocLoading || moveDocFolderOptions.length === 0">
+                    {{ moveDocLoading ? 'Moving…' : 'Move' }}
+                </button>
+            </div>
+        </div>
+    </div>
+    }
+
 </div>

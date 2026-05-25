@@ -28,22 +28,42 @@ router.post('/upload', verifyToken, upload.single('document'), (req, res) => {
     const { originalname, filename, mimetype, size } = req.file;
     const filePath = `uploads/documents/${filename}`;
 
+    // Resolve the category's 'General' default folder for auto-assignment.
+    // If not found (e.g. category doesn't exist in DB yet), folder_id remains NULL.
     db.query(
-        `INSERT INTO documents 
-        (title, description, category, original_filename, stored_filename, file_path, file_type, file_size, uploaded_by)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [title, description || '', category, originalname, filename, filePath, mimetype, size, req.user.id],
-        (err, result) => {
+        `SELECT f.id
+         FROM folders f
+         INNER JOIN categories c ON c.id = f.category_id
+         WHERE c.name = ?
+           AND f.name = 'General'
+           AND f.parent_folder_id IS NULL
+         LIMIT 1`,
+        [category],
+        (err, folderResult) => {
             if (err) {
-                return res.status(500).json({ message: 'Failed to save document record', error: err.message });
+                return res.status(500).json({ message: 'Failed to resolve default folder', error: err.message });
             }
 
-            logActivity(req, 'UPLOAD_DOCUMENT', 'Document Management', `Uploaded document: ${title}`);
+            const folderId = folderResult.length > 0 ? folderResult[0].id : null;
 
-            res.status(201).json({
-                message: 'Document uploaded successfully',
-                documentId: result.insertId
-            });
+            db.query(
+                `INSERT INTO documents 
+                (title, description, category, folder_id, original_filename, stored_filename, file_path, file_type, file_size, uploaded_by)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [title, description || '', category, folderId, originalname, filename, filePath, mimetype, size, req.user.id],
+                (err, result) => {
+                    if (err) {
+                        return res.status(500).json({ message: 'Failed to save document record', error: err.message });
+                    }
+
+                    logActivity(req, 'UPLOAD_DOCUMENT', 'Document Management', `Uploaded document: ${title}`);
+
+                    res.status(201).json({
+                        message: 'Document uploaded successfully',
+                        documentId: result.insertId
+                    });
+                }
+            );
         }
     );
 });
@@ -57,6 +77,7 @@ router.get('/', verifyToken, (req, res) => {
             documents.title,
             documents.description,
             documents.category,
+            documents.folder_id,
             documents.original_filename,
             documents.stored_filename,
             documents.file_path,
@@ -64,9 +85,11 @@ router.get('/', verifyToken, (req, res) => {
             documents.file_size,
             documents.uploaded_by,
             documents.created_at,
-            users.username AS uploaded_by_username
+            users.username AS uploaded_by_username,
+            folders.name AS folder_name
         FROM documents
         LEFT JOIN users ON documents.uploaded_by = users.id
+        LEFT JOIN folders ON documents.folder_id = folders.id
         ORDER BY documents.created_at DESC`,
         (err, result) => {
             if (err) {
@@ -97,6 +120,7 @@ router.get('/search', verifyToken, (req, res) => {
             documents.title,
             documents.description,
             documents.category,
+            documents.folder_id,
             documents.original_filename,
             documents.stored_filename,
             documents.file_path,
@@ -104,9 +128,11 @@ router.get('/search', verifyToken, (req, res) => {
             documents.file_size,
             documents.uploaded_by,
             documents.created_at,
-            users.username AS uploaded_by_username
+            users.username AS uploaded_by_username,
+            folders.name AS folder_name
         FROM documents
         LEFT JOIN users ON documents.uploaded_by = users.id
+        LEFT JOIN folders ON documents.folder_id = folders.id
         WHERE documents.title LIKE ?
            OR documents.description LIKE ?
            OR documents.category LIKE ?
@@ -127,6 +153,106 @@ router.get('/search', verifyToken, (req, res) => {
             );
 
             res.json(result);
+        }
+    );
+});
+
+// ─── MOVE DOCUMENT TO FOLDER ──────────────────────────────────────────────────
+// Reassigns a document to a different folder within the same category.
+// admin/super_admin only. Registered before /:id/view to respect Express ordering.
+
+router.put('/:id/folder', verifyToken, verifyAdminOrSuperAdmin, (req, res) => {
+    const { id } = req.params;
+    const { folder_id } = req.body;
+
+    // folder_id may be null (unassign) or a positive integer
+    const targetFolderId = folder_id === null || folder_id === undefined ? null : Number(folder_id);
+
+    if (folder_id !== null && folder_id !== undefined && isNaN(targetFolderId)) {
+        return res.status(400).json({ message: 'folder_id must be a number or null' });
+    }
+
+    db.query(
+        'SELECT id, category FROM documents WHERE id = ?',
+        [id],
+        (err, docResult) => {
+            if (err) {
+                return res.status(500).json({ message: 'Failed to fetch document', error: err.message });
+            }
+
+            if (docResult.length === 0) {
+                return res.status(404).json({ message: 'Document not found' });
+            }
+
+            const document = docResult[0];
+
+            // Unassign: set folder_id to NULL
+            if (targetFolderId === null) {
+                db.query(
+                    'UPDATE documents SET folder_id = NULL WHERE id = ?',
+                    [id],
+                    (err) => {
+                        if (err) {
+                            return res.status(500).json({ message: 'Failed to update document folder', error: err.message });
+                        }
+
+                        logActivity(
+                            req,
+                            'MOVE_DOCUMENT',
+                            'Document Management',
+                            `Removed document ID: ${id} from folder`
+                        );
+
+                        res.json({ message: 'Document moved successfully' });
+                    }
+                );
+                return;
+            }
+
+            // Validate target folder exists and belongs to the same category as the document
+            db.query(
+                `SELECT f.id, c.name AS category_name
+                 FROM folders f
+                 INNER JOIN categories c ON c.id = f.category_id
+                 WHERE f.id = ?`,
+                [targetFolderId],
+                (err, folderResult) => {
+                    if (err) {
+                        return res.status(500).json({ message: 'Failed to fetch target folder', error: err.message });
+                    }
+
+                    if (folderResult.length === 0) {
+                        return res.status(404).json({ message: 'Target folder not found' });
+                    }
+
+                    const targetFolder = folderResult[0];
+
+                    if (targetFolder.category_name !== document.category) {
+                        return res.status(400).json({
+                            message: 'Target folder does not belong to the same category as the document'
+                        });
+                    }
+
+                    db.query(
+                        'UPDATE documents SET folder_id = ? WHERE id = ?',
+                        [targetFolderId, id],
+                        (err) => {
+                            if (err) {
+                                return res.status(500).json({ message: 'Failed to update document folder', error: err.message });
+                            }
+
+                            logActivity(
+                                req,
+                                'MOVE_DOCUMENT',
+                                'Document Management',
+                                `Moved document ID: ${id} to folder ID: ${targetFolderId}`
+                            );
+
+                            res.json({ message: 'Document moved successfully' });
+                        }
+                    );
+                }
+            );
         }
     );
 });

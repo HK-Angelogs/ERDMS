@@ -18,6 +18,8 @@ export class DashboardComponent implements OnInit {
 
   currentUser: any = null;
 
+  recentActivitiesFiltered: any[] = [];
+
   constructor(
     private dashboardService: DashboardService,
     private cdr: ChangeDetectorRef,   // add this
@@ -26,13 +28,19 @@ export class DashboardComponent implements OnInit {
 
   ) { }
 
+
+
   ngOnInit(): void {
+    this.currentUser = this.authService.getUser();
+    console.log('Current User:', this.currentUser);
+
     this.dashboardService.getStats().subscribe({
       next: (data) => {
         this.stats = data;
+        this.filterRecentActivities();
         this.loading = false;
-        this.cdr.detectChanges();   // add this
-        this.currentUser = this.authService.getUser();
+        this.cdr.detectChanges();
+
       },
       error: (err) => {
         this.error = 'Failed to load dashboard.';
@@ -61,4 +69,37 @@ export class DashboardComponent implements OnInit {
     const user = this.authService.getUser();
     return user ? user.username : 'User';
   }
+
+  filterRecentActivities(): void {
+    if (!this.stats?.recentActivities) {
+      this.recentActivitiesFiltered = [];
+      return;
+    }
+
+    const role = this.currentUser?.role?.toLowerCase();
+
+    console.log('Current Role:', role);
+
+    // SUPER ADMIN -> SEE EVERYTHING
+    if (role === 'super_admin') {
+      this.recentActivitiesFiltered = [...this.stats.recentActivities];
+      return;
+    }
+
+    // ADMIN -> HIDE SUPER ADMIN LOGS
+    if (role === 'admin') {
+      this.recentActivitiesFiltered =
+        this.stats.recentActivities.filter(
+          activity => activity.role !== 'super_admin'
+        );
+      return;
+    }
+
+    // USER -> ONLY USER LOGS
+    this.recentActivitiesFiltered =
+      this.stats.recentActivities.filter(
+        activity => activity.role === 'user'
+      );
+  }
+
 }

@@ -1,0 +1,149 @@
+<div class="folder-popup-overlay" (click)="closeModal.emit()">
+    <div class="folder-popup-card" (click)="$event.stopPropagation()">
+
+        <!-- POPUP HEADER -->
+        <div class="folder-popup-header">
+            <div class="folder-popup-title-group">
+                <span class="folder-popup-icon">📁</span>
+                <div>
+                    <h3 class="folder-popup-title">{{ folder?.name }}</h3>
+                    <span class="folder-popup-category">{{ categoryName }}</span>
+                </div>
+            </div>
+            <button class="modal-close-btn" (click)="closeModal.emit()">✕</button>
+        </div>
+
+        <!-- TAB BAR -->
+        <div class="folder-popup-tabs">
+            <button class="folder-popup-tab-btn" [class.active]="activeTab === 'files'"
+                (click)="tabChange.emit('files')">
+                Files
+                @if (!loading && !forbidden) {
+                <span class="tab-count">({{ files.length }})</span>
+                }
+            </button>
+            @if (isAdmin) {
+            <button class="folder-popup-tab-btn" [class.active]="activeTab === 'permissions'"
+                (click)="tabChange.emit('permissions')">
+                Permissions
+            </button>
+            }
+        </div>
+
+        <!-- FILES TAB -->
+        @if (activeTab === 'files') {
+        <div class="folder-popup-body">
+            @if (loading) {
+            <div class="empty-state">Loading files…</div>
+            } @else if (forbidden) {
+            <div class="folder-popup-forbidden">
+                <span class="forbidden-icon">🔒</span>
+                <p>You do not have permission to view this folder.</p>
+            </div>
+            } @else if (error) {
+            <div class="empty-state folder-error">{{ error }}</div>
+            } @else if (files.length === 0) {
+            <div class="empty-state">This folder has no files.</div>
+            } @else {
+            <table class="folder-files-table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>File Name</th>
+                        <th>Size</th>
+                        <th>Uploaded By</th>
+                        @if (isAdmin) {
+                        <th>Actions</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (doc of files; track doc.id) {
+                    <tr (contextmenu)="onFileRightClick($event, doc)">
+                        <td>
+                            <strong>{{ doc.title }}</strong>
+                            @if (doc.description) {
+                            <p>{{ doc.description }}</p>
+                            }
+                        </td>
+                        <td>{{ doc.original_filename }}</td>
+                        <td>{{ formatFileSize(doc.file_size) }}</td>
+                        <td>{{ doc.uploaded_by_username || 'Deleted User' }}</td>
+                        @if (isAdmin) {
+                        <td>
+                            <button class="folder-action-btn folder-move-btn" (click)="openMoveDoc.emit(doc)"
+                                title="Move to folder">
+                                Move
+                            </button>
+                        </td>
+                        }
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="popup-hint">Right-click a file for more options.</p>
+            }
+        </div>
+        }
+
+        <!-- PERMISSIONS TAB -->
+        @if (activeTab === 'permissions' && isAdmin) {
+        <div class="folder-popup-body">
+            @if (permissionsLoading) {
+            <div class="empty-state">Loading permissions…</div>
+            } @else if (permissionsError && !permissions) {
+            <div class="empty-state folder-error">{{ permissionsError }}</div>
+            } @else if (permissions) {
+
+            <!-- ROLE PERMISSIONS -->
+            <div class="permissions-section">
+                <h4 class="permissions-section-title">Role Permissions</h4>
+                <p class="permissions-section-hint">
+                    Admin and super admin always have full access and cannot be restricted.
+                </p>
+                <div class="permission-row">
+                    <label class="permission-label">
+                        <input type="checkbox" [checked]="permRoleUser"
+                            (change)="permRoleUserChange.emit($any($event.target).checked)">
+                        <span>All users can view this folder</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- USER PERMISSIONS -->
+            @if (permUsers.length > 0) {
+            <div class="permissions-section">
+                <h4 class="permissions-section-title">Individual User Permissions</h4>
+                <p class="permissions-section-hint">
+                    Individual overrides take effect alongside role permissions (OR logic).
+                </p>
+                <div class="permission-user-list">
+                    @for (u of permUsers; track u.user_id) {
+                    <div class="permission-user-row">
+                        <label class="permission-label">
+                            <input type="checkbox" [(ngModel)]="u.can_view">
+                            <span>{{ u.username }}</span>
+                        </label>
+                    </div>
+                    }
+                </div>
+            </div>
+            }
+
+            @if (permissionsError) {
+            <p class="modal-error">{{ permissionsError }}</p>
+            }
+
+            <div class="permissions-save-row">
+                <button class="primary-btn modal-submit-btn" (click)="savePermissions.emit()"
+                    [disabled]="permissionsSaving">
+                    {{ permissionsSaving ? 'Saving…' : 'Save Permissions' }}
+                </button>
+            </div>
+
+            }
+        </div>
+        }
+
+    </div>
+</div>

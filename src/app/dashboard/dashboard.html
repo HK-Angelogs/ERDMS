@@ -104,7 +104,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let activity of stats.recentActivities">
+                        <tr *ngFor="let activity of recentActivitiesFiltered">
                             <td><strong>{{ activity.username }}</strong></td>
                             <td>
                                 <span class="role-badge" [class.super-admin]="activity.role === 'super_admin'"

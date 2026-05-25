@@ -14,14 +14,12 @@
 │   │   ├── auth.js
 │   │   ├── dashboard.js
 │   │   ├── documents.js
+│   │   ├── folders.js
 │   │   └── users.js
 │   ├── server.js
 │   └── uploads
 │       └── documents
-│           ├── 1779332462707-sample.txt
-│           ├── 1779337272602-sample.txt
-│           ├── 1779433464964-OSH_PROGRAMMING.pdf
-│           └── 1779676722559-2.txt
+│           └── 1779736276490-sample.txt
 ├── package.json
 ├── package-lock.json
 ├── public
@@ -52,8 +50,14 @@
 │   │   │   ├── documents.css
 │   │   │   ├── documents.html
 │   │   │   ├── documents.spec.ts
-│   │   │   └── documents.ts
+│   │   │   ├── documents.ts
+│   │   │   └── edit-folder-modal
+│   │   │       ├── edit-folder-modal.css
+│   │   │       ├── edit-folder-modal.html
+│   │   │       ├── edit-folder-modal.spec.ts
+│   │   │       └── edit-folder-modal.ts
 │   │   ├── document.service.ts
+│   │   ├── folder.service.ts
 │   │   ├── login
 │   │   │   ├── login.css
 │   │   │   ├── login.html
@@ -93,4 +97,4 @@
 ├── tsconfig.json
 └── tsconfig.spec.json
 
-19 directories, 75 files
+20 directories, 78 files
