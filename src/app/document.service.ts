@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -32,6 +32,19 @@ export class DocumentService {
         return this.http.get<any[]>(
             `${this.apiUrl}/documents`,
             this.getAuthHeaders()
+        );
+    }
+
+    searchDocuments(query: string): Observable<any[]> {
+        const params = new HttpParams().set('q', query);
+        const token = localStorage.getItem('token');
+
+        return this.http.get<any[]>(
+            `${this.apiUrl}/documents/search`,
+            {
+                headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
+                params
+            }
         );
     }
 

@@ -1,0 +1,165 @@
+const express = require('express');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const db = require('../config/db');
+const logActivity = require('../config/logger');
+const { verifyToken } = require('../middleware/auth');
+
+const router = express.Router();
+const JWT_SECRET = 'secret_key';
+
+// ─── REGISTER ─────────────────────────────────────────────────────────────────
+
+router.post('/register', async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        db.query(
+            'INSERT INTO users (username, password) VALUES (?, ?)',
+            [username, hashedPassword],
+            (err, result) => {
+                if (err) {
+                    if (err.code === 'ER_DUP_ENTRY') {
+                        return res.status(400).json({ message: 'Username already exists' });
+                    }
+
+                    return res.status(500).json({
+                        message: 'Failed to register user',
+                        error: err.message
+                    });
+                }
+
+                // Build a minimal req-like object since no token exists at registration time
+                const fakeReq = {
+                    user: { id: result.insertId, username, role: 'user' },
+                    ip: req.ip,
+                    connection: req.connection
+                };
+
+                logActivity(fakeReq, 'REGISTER', 'Authentication', `New user registered: ${username}`);
+
+                res.status(201).json({
+                    message: 'User registered successfully',
+                    userId: result.insertId
+                });
+            }
+        );
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
+// ─── LOGIN ────────────────────────────────────────────────────────────────────
+
+router.post('/login', (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
+    }
+
+    db.query(
+        'SELECT * FROM users WHERE username = ?',
+        [username],
+        async (err, result) => {
+            if (err) {
+                return res.status(500).json({ message: 'Login failed', error: err.message });
+            }
+
+            if (result.length === 0) {
+                return res.status(401).json({ message: 'Invalid username or password' });
+            }
+
+            const user = result[0];
+
+            if (user.disabled) {
+                return res.status(403).json({ message: 'Account is disabled' });
+            }
+
+            const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+            if (!isPasswordCorrect) {
+                return res.status(401).json({ message: 'Invalid username or password' });
+            }
+
+            const token = jwt.sign(
+                { id: user.id, username: user.username, role: user.role },
+                JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+
+            const fakeReq = {
+                user: { id: user.id, username: user.username, role: user.role },
+                ip: req.ip,
+                connection: req.connection
+            };
+
+            logActivity(fakeReq, 'LOGIN', 'Authentication', 'User logged in successfully');
+
+            res.json({
+                message: 'Login successful',
+                token,
+                user: { id: user.id, username: user.username, role: user.role }
+            });
+        }
+    );
+});
+
+// ─── LOGOUT ───────────────────────────────────────────────────────────────────
+
+router.post('/logout', verifyToken, (req, res) => {
+    logActivity(req, 'LOGOUT', 'Authentication', 'User logged out');
+    res.json({ message: 'Logout logged successfully' });
+});
+
+// ─── CHANGE PASSWORD ──────────────────────────────────────────────────────────
+
+router.post('/change-password', verifyToken, async (req, res) => {
+    try {
+        const { newPassword } = req.body;
+        const userId = req.user.id;
+
+        if (!newPassword || newPassword.trim() === '') {
+            return res.status(400).json({ message: 'New password is required' });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        db.query(
+            'UPDATE users SET password = ? WHERE id = ?',
+            [hashedPassword, userId],
+            (err, result) => {
+                if (err) {
+                    return res.status(500).json({
+                        message: 'Failed to update password',
+                        error: err.message
+                    });
+                }
+
+                if (result.affectedRows === 0) {
+                    return res.status(404).json({ message: 'User not found' });
+                }
+
+                logActivity(
+                    req,
+                    'CHANGE_PASSWORD',
+                    'Authentication',
+                    `User ID: ${userId} updated their default password`
+                );
+
+                res.status(200).json({ message: 'Password updated successfully' });
+            }
+        );
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+});
+
+module.exports = router;

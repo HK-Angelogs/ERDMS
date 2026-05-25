@@ -1,6 +1,8 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { DocumentService } from '../document.service';
 import { AuthService } from '../auth.service';
 
@@ -11,7 +13,7 @@ import { AuthService } from '../auth.service';
   templateUrl: './documents.html',
   styleUrl: './documents.css'
 })
-export class Documents implements OnInit {
+export class Documents implements OnInit, OnDestroy {
   title = '';
   description = '';
   category = '';
@@ -21,6 +23,12 @@ export class Documents implements OnInit {
   filteredDocuments: any[] = [];
 
   selectedCategory = 'All';
+
+  // Search state
+  searchQuery = '';
+  isSearching = false;
+  private searchSubject = new Subject<string>();
+  private searchSubscription: Subscription | null = null;
 
   currentUser: any = null;
   currentRole: string | null = null;
@@ -52,7 +60,64 @@ export class Documents implements OnInit {
       return;
     }
 
+    this.initSearchDebounce();
     this.loadDocuments();
+  }
+
+  ngOnDestroy() {
+    this.searchSubscription?.unsubscribe();
+  }
+
+  private initSearchDebounce() {
+    this.searchSubscription = this.searchSubject.pipe(
+      debounceTime(350),
+      distinctUntilChanged(),
+      switchMap((query) => {
+        const trimmed = query.trim();
+
+        if (!trimmed) {
+          // Empty query: restore full list with current category filter
+          this.isSearching = false;
+          this.applyCategoryFilter();
+          this.cdr.detectChanges();
+          // Return an observable that emits nothing so switchMap is satisfied
+          return [];
+        }
+
+        this.isSearching = true;
+        return this.documentService.searchDocuments(trimmed);
+      })
+    ).subscribe({
+      next: (results: any[]) => {
+        // Only update when we actually got search results (not from empty-query branch)
+        if (this.isSearching) {
+          this.filteredDocuments = results;
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        console.error('Search failed:', err);
+        this.message = err.error?.message || 'Search failed';
+        this.isSearching = false;
+
+        if (err.status === 401 || err.status === 403) {
+          this.router.navigate(['/login']);
+        }
+
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  onSearchInput() {
+    this.searchSubject.next(this.searchQuery);
+  }
+
+  clearSearch() {
+    this.searchQuery = '';
+    this.isSearching = false;
+    this.applyCategoryFilter();
+    this.cdr.detectChanges();
   }
 
   isAdminOrSuperAdmin(): boolean {
@@ -123,7 +188,12 @@ export class Documents implements OnInit {
     this.documentService.getDocuments().subscribe({
       next: (data) => {
         this.documents = data;
-        this.applyCategoryFilter();
+
+        // Respect active search: if user has a query, don't overwrite search results
+        if (!this.isSearching) {
+          this.applyCategoryFilter();
+        }
+
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -146,6 +216,15 @@ export class Documents implements OnInit {
     this.filteredDocuments = this.documents.filter(
       (document) => document.category === this.selectedCategory
     );
+  }
+
+  onCategoryChange() {
+    // Clear search when category filter changes so both don't conflict
+    if (this.searchQuery) {
+      this.clearSearch();
+    } else {
+      this.applyCategoryFilter();
+    }
   }
 
   viewDocument(id: number) {
@@ -185,6 +264,7 @@ export class Documents implements OnInit {
     this.documentService.deleteDocument(id).subscribe({
       next: (response) => {
         this.message = response.message || 'Document deleted successfully';
+        this.clearSearch();
         this.loadDocuments();
       },
       error: (err) => {
@@ -222,5 +302,4 @@ export class Documents implements OnInit {
   get userRole(): string | null {
     return this.authService.getRole();
   }
-
 }

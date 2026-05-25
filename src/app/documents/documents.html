@@ -74,22 +74,42 @@
                 <p>Total documents: {{ filteredDocuments.length }}</p>
             </div>
 
-            <div class="filter-box">
-                <label>Filter by category</label>
+            <div class="section-controls">
+                <!-- SEARCH BOX -->
+                <div class="search-box">
+                    <label>Search</label>
+                    <div class="search-input-wrapper">
+                        <input type="text" [(ngModel)]="searchQuery" (input)="onSearchInput()"
+                            placeholder="Search by title, category, file, uploader…" class="search-input">
+                        @if (searchQuery) {
+                        <button class="clear-search-btn" (click)="clearSearch()" title="Clear search">
+                            ✕
+                        </button>
+                        }
+                    </div>
+                </div>
 
-                <select [(ngModel)]="selectedCategory" (change)="applyCategoryFilter()">
-                    <option value="All">All</option>
+                <!-- CATEGORY FILTER -->
+                <div class="filter-box">
+                    <label>Filter by category</label>
+                    <select [(ngModel)]="selectedCategory" (change)="onCategoryChange()">
+                        <option value="All">All</option>
 
-                    @for (item of categories; track item) {
-                    <option [value]="item">
-                        {{ item }}
-                    </option>
-                    }
-                </select>
+                        @for (item of categories; track item) {
+                        <option [value]="item">
+                            {{ item }}
+                        </option>
+                        }
+                    </select>
+                </div>
             </div>
         </div>
 
-        @if (filteredDocuments.length === 0) {
+        @if (isSearching && filteredDocuments.length === 0) {
+        <div class="empty-state">
+            No documents match your search.
+        </div>
+        } @else if (!isSearching && filteredDocuments.length === 0) {
         <div class="empty-state">
             No documents found.
         </div>
