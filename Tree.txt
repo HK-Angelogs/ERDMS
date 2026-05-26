@@ -20,7 +20,8 @@
 │   ├── server.js
 │   ├── uploads
 │   │   └── documents
-│   │       └── 1779736276490-sample.txt
+│   │       ├── 1779736276490-sample.txt
+│   │       └── 1779789082190-OSH_PROGRAMMING.pdf
 │   └── utils
 │       └── passwordValidator.js
 ├── package.json
@@ -63,6 +64,11 @@
 │   │   ├── folder.service.ts
 │   │   ├── interceptors
 │   │   │   └── force-password.interceptor.ts
+│   │   ├── landing
+│   │   │   ├── landing.css
+│   │   │   ├── landing.html
+│   │   │   ├── landing.spec.ts
+│   │   │   └── landing.ts
 │   │   ├── login
 │   │   │   ├── login.css
 │   │   │   ├── login.html
@@ -89,13 +95,11 @@
 │   │   │   ├── users.html
 │   │   │   ├── users.spec.ts
 │   │   │   └── users.ts
-│   │   ├── user-statistics
-│   │   │   ├── user-statistics.css
-│   │   │   ├── user-statistics.html
-│   │   │   ├── user-statistics.spec.ts
-│   │   │   └── user-statistics.ts
 │   │   └── utils
 │   │       └── password-validator.ts
+│   ├── assets
+│   │   └── images
+│   │       └── landing-bg.png
 │   ├── index.html
 │   ├── main.ts
 │   └── styles.css
@@ -104,4 +108,4 @@
 ├── tsconfig.json
 └── tsconfig.spec.json
 
-23 directories, 82 files
+25 directories, 84 files

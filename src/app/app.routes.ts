@@ -7,10 +7,11 @@ import { Monitoring } from './monitoring/monitoring';
 import { DashboardComponent } from './dashboard/dashboard';
 import { changePassword } from './change-password/change-password';
 import { authGuard } from './auth.guard';
+import { LandingComponent } from './landing/landing';
 
 export const routes: Routes = [
-    { path: '', redirectTo: 'login', pathMatch: 'full' },
 
+    { path: 'landing', component: LandingComponent },
     { path: 'login', component: Login },
     { path: 'register', component: Register },
 
@@ -21,5 +22,5 @@ export const routes: Routes = [
     { path: 'monitoring', component: Monitoring, canActivate: [authGuard] },
     { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
 
-    { path: '**', redirectTo: 'login' }
+    { path: '**', redirectTo: 'landing' }
 ];

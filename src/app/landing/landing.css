@@ -1,0 +1,132 @@
+/*
+ * The blurred background is applied via ::before so that the blur filter
+ * does not cascade to foreground content. scale(1.02) prevents the feathered
+ * blur edge from exposing a transparent gap around the viewport boundary.
+ */
+
+.landing-page {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background: url('/assets/images/landing-bg.png') no-repeat center center / cover;
+    /* fallback while image loads */
+}
+
+.landing-page::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    /* slightly oversize to cover blur edge artifacts */
+    background: url('/assets/images/landing-bg.png') no-repeat center center / cover;
+    filter: blur(2px);
+    transform: scale(1.02);
+    z-index: 0;
+}
+
+/* ─── Content ─────────────────────────────────────────── */
+
+.landing-content {
+    position: relative;
+    z-index: 1;
+    padding: 30vh 9% 4rem;
+    max-width: 900px;
+}
+
+/* ─── Brand Name ──────────────────────────────────────── */
+
+.brand-name {
+    font-family: 'Boldonse', cursive;
+    font-size: clamp(56px, 8vw, 100px);
+    color: #061a29;
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0 0 0.75rem;
+    filter: drop-shadow(10px 4px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* ─── System Title ────────────────────────────────────── */
+
+.system-title {
+    font-family: 'Boldonse', cursive;
+    font-size: 15px;
+    color: #000000;
+    font-weight: 400;
+    line-height: 1.2;
+    margin: 0 0 0.75rem;
+    max-width: 761px;
+}
+
+/* ─── Description ─────────────────────────────────────── */
+
+.system-description {
+    font-family: 'Noto Serif Tamil', serif;
+    font-size: 15px;
+    color: #000000;
+    font-weight: 400;
+    line-height: 1.6;
+    margin: 0 0 2.5rem;
+    max-width: 490px;
+}
+
+/* ─── Login Button ────────────────────────────────────── */
+
+.login-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.login-btn:hover {
+    opacity: 0.75;
+}
+
+.login-btn:focus-visible {
+    outline: 3px solid #061a29;
+    outline-offset: 4px;
+    border-radius: 4px;
+}
+
+.login-label {
+    font-family: 'Boldonse', cursive;
+    font-size: 21px;
+    font-weight: 400;
+    color: #000000;
+    line-height: 1.2;
+}
+
+.login-arrow {
+    display: block;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+}
+
+/* ─── Responsive ──────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .landing-content {
+        padding: 20vh 6% 3rem;
+    }
+
+    .system-description {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .landing-content {
+        padding: 15vh 5% 2rem;
+    }
+
+    .system-title {
+        font-size: 14px;
+    }
+
+    .system-description {
+        font-size: 14px;
+    }
+}

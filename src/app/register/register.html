@@ -25,11 +25,11 @@
             </div>
 
             <!-- Live password requirements checklist — visible once the user starts typing -->
-            @if (passwordRequirements.length > 0) {
+            @if (unmetRequirements.length > 0) {
             <ul class="password-requirements">
-                @for (req of passwordRequirements; track req.label) {
-                <li [class.requirement-met]="req.met" [class.requirement-unmet]="!req.met">
-                    <span class="requirement-icon">{{ req.met ? '✓' : '✗' }}</span>
+                @for (req of unmetRequirements; track req.label) {
+                <li class="requirement-unmet">
+                    <span class="requirement-icon">✗</span>
                     {{ req.label }}
                 </li>
                 }
