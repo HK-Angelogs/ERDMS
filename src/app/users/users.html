@@ -28,10 +28,17 @@
         <div class="form-title">
             <h2>Add New User</h2>
 
-            <p>
-                New accounts automatically receive the default password:
-                <strong>default</strong>
+            @if (lastCreatedPassword) {
+            <p class="temp-password-notice">
+                Temporary password for the new account
+                (share this once — it will not be shown again):
+                <strong class="temp-password-value">{{ lastCreatedPassword }}</strong>
             </p>
+            } @else {
+            <p>
+                A unique temporary password will be generated and displayed here when a new account is created.
+            </p>
+            }
         </div>
 
         <div class="form-controls">

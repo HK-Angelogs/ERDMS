@@ -8,6 +8,11 @@ const {
     verifyAdminOrSuperAdmin,
     verifySelfOrAdminOverUser
 } = require('../middleware/auth');
+const {
+    validatePassword,
+    generateTemporaryPassword,
+    SALT_ROUNDS
+} = require('../utils/passwordValidator');
 
 const router = express.Router();
 
@@ -37,7 +42,7 @@ router.get('/', verifyToken, (req, res) => {
 
 // ─── GET SINGLE USER BY ID ────────────────────────────────────────────────────
 
-router.get('/:id', (req, res) => {
+router.get('/:id', verifyToken, (req, res) => {
     const { id } = req.params;
 
     db.query(
@@ -79,10 +84,11 @@ router.post('/add-user', verifyToken, verifyAdminOrSuperAdmin, async (req, res) 
     }
 
     try {
-        const hashedPassword = await bcrypt.hash('default', 10);
+        const temporaryPassword = generateTemporaryPassword();
+        const hashedPassword = await bcrypt.hash(temporaryPassword, SALT_ROUNDS);
 
         db.query(
-            'INSERT INTO users (username, password, role) VALUES (?, ?, ?)',
+            'INSERT INTO users (username, password, role, force_password_change) VALUES (?, ?, ?, TRUE)',
             [username, hashedPassword, finalRole],
             (err, result) => {
                 if (err) {
@@ -100,10 +106,12 @@ router.post('/add-user', verifyToken, verifyAdminOrSuperAdmin, async (req, res) 
                     `Added new user: ${username} with role: ${finalRole}`
                 );
 
+                // temporaryPassword is returned once here and never stored in plaintext.
+                // The admin must share this with the user; it will be required to change on first login.
                 res.status(201).json({
                     message: 'User added successfully',
                     userId: result.insertId,
-                    defaultPassword: 'default'
+                    temporaryPassword
                 });
             }
         );
@@ -127,7 +135,13 @@ router.put('/update-user/:id', verifyToken, verifySelfOrAdminOverUser, async (re
         let values;
 
         if (password && password.trim() !== '') {
-            const hashedPassword = await bcrypt.hash(password, 10);
+            const { isValid, errors } = validatePassword(password);
+
+            if (!isValid) {
+                return res.status(400).json({ message: 'Password does not meet requirements.', errors });
+            }
+
+            const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
             sql = 'UPDATE users SET username = ?, password = ? WHERE id = ?';
             values = [username, hashedPassword, id];
         } else {

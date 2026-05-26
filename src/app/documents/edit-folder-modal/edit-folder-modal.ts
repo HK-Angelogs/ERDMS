@@ -3,7 +3,8 @@ import {
   Input,
   Output,
   EventEmitter,
-  ViewEncapsulation
+  ViewEncapsulation,
+  HostListener
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
@@ -59,6 +60,13 @@ export class EditFolderModal {
     event.preventDefault();
     event.stopPropagation();
     this.fileRightClick.emit({ event, doc });
+  }
+
+  @Output() popupCardClick = new EventEmitter<void>();
+
+  onPopupCardClick(event: MouseEvent): void {
+    event.stopPropagation();
+    this.popupCardClick.emit();
   }
 
   // ─── UTILITY ─────────────────────────────────────────────────────────────

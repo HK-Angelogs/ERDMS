@@ -15,6 +15,7 @@ import { EditUserModal } from './edit-user-modal/edit-user-modal';
 export class Users implements OnInit {
   username = '';
   selectedUser: any = null;
+  lastCreatedPassword: string | null = null;
 
   apiUrl = 'http://localhost:3000';
 
@@ -102,10 +103,11 @@ export class Users implements OnInit {
       return;
     }
 
-    this.http.post(`${this.apiUrl}/users/add-user`, {
+    this.http.post<any>(`${this.apiUrl}/users/add-user`, {
       username: this.username
     }, this.getAuthHeaders()).subscribe({
-      next: () => {
+      next: (response) => {
+        this.lastCreatedPassword = response.temporaryPassword || null;
         this.username = '';
         this.loadUsers();
       },

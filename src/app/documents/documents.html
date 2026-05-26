@@ -438,11 +438,12 @@
 
     @if (showFolderPopup && folderPopupTarget) {
     <app-edit-folder-modal [folder]="folderPopupTarget" [files]="folderPopupFiles" [loading]="folderPopupLoading"
-        [error]="folderPopupError" [forbidden]="folderPopupForbidden" [activeTab]="folderPopupActiveTab"
-        [categoryName]="getCategoryName(folderPopupTarget.category_id)" [permissions]="folderPermissions"
-        [permissionsLoading]="folderPermissionsLoading" [permissionsError]="folderPermissionsError"
-        [permissionsSaving]="folderPermissionsSaving" [permRoleUser]="folderPermRoleUser" [permUsers]="folderPermUsers"
-        [isAdmin]="isAdminOrSuperAdmin()" (closeModal)="closeFolderPopup()" (tabChange)="setFolderPopupTab($event)"
+        [error]="folderPopupError" [forbidden]="folderPopupForbidden" (popupCardClick)="closeContextMenu()"
+        [activeTab]="folderPopupActiveTab" [categoryName]="getCategoryName(folderPopupTarget.category_id)"
+        [permissions]="folderPermissions" [permissionsLoading]="folderPermissionsLoading"
+        [permissionsError]="folderPermissionsError" [permissionsSaving]="folderPermissionsSaving"
+        [permRoleUser]="folderPermRoleUser" [permUsers]="folderPermUsers" [isAdmin]="isAdminOrSuperAdmin()"
+        (closeModal)="closeFolderPopup()" (tabChange)="setFolderPopupTab($event)"
         (openMoveDoc)="openMoveDocModal($event)" (fileRightClick)="onModalFileRightClick($event)"
         (permRoleUserChange)="folderPermRoleUser = $event" (savePermissions)="submitFolderPermissions()">
     </app-edit-folder-modal>

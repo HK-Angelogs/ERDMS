@@ -1,5 +1,5 @@
 <div class="folder-popup-overlay" (click)="closeModal.emit()">
-    <div class="folder-popup-card" (click)="$event.stopPropagation()">
+    <div class="folder-popup-card" (click)="onPopupCardClick($event)">
 
         <!-- POPUP HEADER -->
         <div class="folder-popup-header">
@@ -52,9 +52,6 @@
                         <th>File Name</th>
                         <th>Size</th>
                         <th>Uploaded By</th>
-                        @if (isAdmin) {
-                        <th>Actions</th>
-                        }
                     </tr>
                 </thead>
                 <tbody>
@@ -69,14 +66,6 @@
                         <td>{{ doc.original_filename }}</td>
                         <td>{{ formatFileSize(doc.file_size) }}</td>
                         <td>{{ doc.uploaded_by_username || 'Deleted User' }}</td>
-                        @if (isAdmin) {
-                        <td>
-                            <button class="folder-action-btn folder-move-btn" (click)="openMoveDoc.emit(doc)"
-                                title="Move to folder">
-                                Move
-                            </button>
-                        </td>
-                        }
                     </tr>
                     }
                 </tbody>

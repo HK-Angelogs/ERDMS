@@ -82,21 +82,15 @@ export class Login implements AfterViewInit, OnDestroy {
       password: this.password
     }).subscribe({
       next: (response) => {
-        // ADD THIS CONSOLE LOG:
-        console.log('Backend Response:', response);
-
         // 1. Grab the user object from the response
         const userToSave = response.user;
 
-        // 2. Check the password the user JUST typed into the login form
-        if (this.password === 'default') {
-          userToSave.isdefaultPassword = true;
-        } else {
-          userToSave.isdefaultPassword = false;
-        }
+        // 2. Use the backend flag — replaces the previous 'default' string comparison
+        //    which broke when default passwords became randomly generated.
+        userToSave.isdefaultPassword = !!response.user.forcePasswordChange;
 
         this.authService.saveToken(response.token);
-        this.authService.saveUser(response.user);
+        this.authService.saveUser(userToSave);
 
         // Check if the user needs to change their password
         if (this.authService.requiresPasswordChange()) {

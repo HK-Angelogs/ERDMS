@@ -6,7 +6,8 @@
 │   │   ├── logger.js
 │   │   └── upload.js
 │   ├── middleware
-│   │   └── auth.js
+│   │   ├── auth.js
+│   │   └── enforcePasswordChange.js
 │   ├── package.json
 │   ├── package-lock.json
 │   ├── routes
@@ -17,9 +18,11 @@
 │   │   ├── folders.js
 │   │   └── users.js
 │   ├── server.js
-│   └── uploads
-│       └── documents
-│           └── 1779736276490-sample.txt
+│   ├── uploads
+│   │   └── documents
+│   │       └── 1779736276490-sample.txt
+│   └── utils
+│       └── passwordValidator.js
 ├── package.json
 ├── package-lock.json
 ├── public
@@ -58,6 +61,8 @@
 │   │   │       └── edit-folder-modal.ts
 │   │   ├── document.service.ts
 │   │   ├── folder.service.ts
+│   │   ├── interceptors
+│   │   │   └── force-password.interceptor.ts
 │   │   ├── login
 │   │   │   ├── login.css
 │   │   │   ├── login.html
@@ -84,11 +89,13 @@
 │   │   │   ├── users.html
 │   │   │   ├── users.spec.ts
 │   │   │   └── users.ts
-│   │   └── user-statistics
-│   │       ├── user-statistics.css
-│   │       ├── user-statistics.html
-│   │       ├── user-statistics.spec.ts
-│   │       └── user-statistics.ts
+│   │   ├── user-statistics
+│   │   │   ├── user-statistics.css
+│   │   │   ├── user-statistics.html
+│   │   │   ├── user-statistics.spec.ts
+│   │   │   └── user-statistics.ts
+│   │   └── utils
+│   │       └── password-validator.ts
 │   ├── index.html
 │   ├── main.ts
 │   └── styles.css
@@ -97,4 +104,4 @@
 ├── tsconfig.json
 └── tsconfig.spec.json
 
-20 directories, 78 files
+23 directories, 82 files

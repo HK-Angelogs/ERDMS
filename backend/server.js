@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 
 const { verifyToken } = require('./middleware/auth');
+const { enforcePasswordChange } = require('./middleware/enforcePasswordChange');
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
@@ -35,12 +36,21 @@ app.get('/', (req, res) => {
 
 // ─── ROUTES ───────────────────────────────────────────────────────────────────
 
+// Auth routes are exempt from enforcePasswordChange.
+// /login, /register, /logout, and /change-password are all under this mount.
+// Individual handlers within authRoutes apply verifyToken where required.
 app.use('/', authRoutes);
-app.use('/users', userRoutes);
-app.use('/documents', documentRoutes);
-app.use('/activity-logs', activityLogRoutes);
-app.use('/api/dashboard', verifyToken, dashboardRoutes);
-app.use('/folders', folderRoutes);
+
+// Protected route groups.
+// verifyToken runs at mount level here; enforcePasswordChange queries DB
+// to block all access when force_password_change = TRUE.
+// Note: individual route handlers in these files also call verifyToken — this
+// is harmless (token verified twice) and does not require a refactor.
+app.use('/users', verifyToken, enforcePasswordChange, userRoutes);
+app.use('/documents', verifyToken, enforcePasswordChange, documentRoutes);
+app.use('/activity-logs', verifyToken, enforcePasswordChange, activityLogRoutes);
+app.use('/api/dashboard', verifyToken, enforcePasswordChange, dashboardRoutes);
+app.use('/folders', verifyToken, enforcePasswordChange, folderRoutes);
 
 // ─── START ────────────────────────────────────────────────────────────────────
 
